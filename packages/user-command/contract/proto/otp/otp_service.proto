@@ -1,0 +1,18 @@
+syntax = "proto3";
+package otp.v1;
+
+import "otp/otp.proto";
+
+option go_package = "shopify-user-command-module/contract/protogen/otp";
+
+// OTPCommandService provides commands for user management.
+service OTPCommandService {
+  //  Verify otp in the system.
+  rpc Verify(VerifyRequest) returns (VerifyResponse);
+  
+  // Resend otp in the system
+  rpc Resend(ResendRequest) returns (ResendResponse);
+}
+
+// UserQueryService provides queries for service call.
+service OTPQueryService {}

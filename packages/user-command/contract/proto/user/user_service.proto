@@ -1,0 +1,15 @@
+syntax = "proto3";
+package user.v1;
+
+import "user/user.proto";
+
+option go_package = "shopify-user-command-module/contract/protogen/user";
+
+// UserCommandService provides commands for user management.
+service UserCommandService {
+  //  registers a new user in the system.
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+}
+
+// UserQueryService provides queries for service call.
+service UserQueryService {}

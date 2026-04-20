@@ -1,0 +1,6 @@
+version: v2
+modules:
+  - path: contract/proto
+
+deps:
+  - buf.build/envoyproxy/protoc-gen-validate
