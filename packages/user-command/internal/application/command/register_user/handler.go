@@ -19,11 +19,5 @@ func NewHandler(service userService) Executor {
 }
 
 func (h *handler) Execute(ctx context.Context, cmd Command) (*Result, error) {
-	result, err := h.service.Register(ctx, cmd)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return h.service.Register(ctx, cmd)
 }

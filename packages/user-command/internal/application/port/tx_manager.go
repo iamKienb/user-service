@@ -1,9 +1,7 @@
 package port
 
-import (
-	postgresx "github.com/iamKienb/shopify-go-platform/postgres"
-)
+import "context"
 
 type TxManager interface {
-	postgresx.TxManager
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }

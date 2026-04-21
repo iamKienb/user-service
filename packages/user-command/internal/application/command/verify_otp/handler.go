@@ -17,10 +17,5 @@ func NewHandler(service otpService) Executor {
 }
 
 func (h *handler) Execute(ctx context.Context, cmd Command) (*Result, error) {
-	result, err := h.service.Verify(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return h.service.Verify(ctx, cmd)
 }

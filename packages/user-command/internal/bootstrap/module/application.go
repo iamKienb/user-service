@@ -18,8 +18,9 @@ type ApplicationModule struct {
 
 func NewApplicationModule(infra *InfraModule) *ApplicationModule {
 	userService := user.NewUserService(
-		infra.IdentityRepo,
-		infra.Cache,
+		infra.AccountRepo,
+		infra.AuthRepo,
+		infra.UserCache,
 		infra.OtpCache,
 		infra.TokenGenerator,
 		infra.TxManager,
@@ -27,7 +28,7 @@ func NewApplicationModule(infra *InfraModule) *ApplicationModule {
 	)
 
 	otpService := otp.NewOTPService(
-		infra.IdentityRepo,
+		infra.AccountRepo,
 		infra.TokenGenerator,
 		infra.OtpCache,
 		infra.TxManager,

@@ -3,11 +3,14 @@ package module
 import (
 	"context"
 	"fmt"
+
 	"shopify-user-command-module/internal/application/port"
 	"shopify-user-command-module/internal/bootstrap/config"
-	"shopify-user-command-module/internal/domain/identity"
+	"shopify-user-command-module/internal/domain/account"
+	"shopify-user-command-module/internal/domain/auth"
 	"shopify-user-command-module/internal/infra/cache"
-	"shopify-user-command-module/internal/infra/postgres/user"
+	accountpg "shopify-user-command-module/internal/infra/postgres/account"
+	authpg "shopify-user-command-module/internal/infra/postgres/auth"
 	"shopify-user-command-module/internal/infra/security"
 
 	postgresx "github.com/iamKienb/shopify-go-platform/postgres"
@@ -16,9 +19,10 @@ import (
 )
 
 type InfraModule struct {
-	Pool           *pgxpool.Pool
-	IdentityRepo   identity.Repository
-	Cache          port.UserCache
+	PostgresPool   *pgxpool.Pool
+	AccountRepo    account.Repository
+	AuthRepo       auth.Repository
+	UserCache      port.UserCache
 	OtpCache       port.OTPCache
 	TxManager      port.TxManager
 	Hasher         port.PasswordHasher
@@ -28,33 +32,22 @@ type InfraModule struct {
 func NewInfraModule(ctx context.Context, cfg *config.UserCommandConfig) (*InfraModule, error) {
 	pgClient, err := postgresx.New(cfg.Postgres)
 	if err != nil {
-		return nil, fmt.Errorf("Postgres: %w", err)
+		return nil, fmt.Errorf("postgres: %w", err)
 	}
 
 	redisClient, err := redisx.New(cfg.Redis)
 	if err != nil {
-		return nil, fmt.Errorf("Redis: %w", err)
+		return nil, fmt.Errorf("redis: %w", err)
 	}
 
-	repo := user.NewUserRepository(pgClient.Pool)
-
-	userCache := cache.NewUserCache(redisClient.Conn)
-	otpCache := cache.NewOTPCache(redisClient.Conn)
-
-	txManager := postgresx.NewTxManager(pgClient.Pool)
-
-	argonHasher := security.NewArgon2Hasher(cfg.Argon2)
-
-	jwtGenerator := security.NewJWTGenerator(cfg.Jwt)
-
 	return &InfraModule{
-		Pool:           pgClient.Pool,
-		IdentityRepo:   repo,
-		Cache:          userCache,
-		OtpCache:       otpCache,
-		TxManager:      txManager,
-		Hasher:         argonHasher,
-		TokenGenerator: jwtGenerator,
+		PostgresPool:   pgClient.Pool,
+		AccountRepo:    accountpg.NewRepository(pgClient.Pool),
+		AuthRepo:       authpg.NewRepository(pgClient.Pool),
+		UserCache:      cache.NewUserCache(redisClient.Conn),
+		OtpCache:       cache.NewOTPCache(redisClient.Conn),
+		TxManager:      postgresx.NewTxManager(pgClient.Pool),
+		Hasher:         security.NewArgon2Hasher(cfg.Argon2),
+		TokenGenerator: security.NewJWTGenerator(cfg.Jwt),
 	}, nil
-
 }

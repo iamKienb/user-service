@@ -11,5 +11,6 @@ func IsDuplicateEmail(err error) bool {
 	if errors.As(err, &pgErr) {
 		return pgErr.Code == "23505" && pgErr.ConstraintName == "uq_users_email"
 	}
+
 	return false
 }

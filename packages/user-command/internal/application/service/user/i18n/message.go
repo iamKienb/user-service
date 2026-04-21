@@ -1,9 +1,16 @@
 package i18n
 
 const (
+	MsgEmailInvalid       = "email address is invalid"
+	MsgEmailEmpty         = "email address is required"
 	MsgEmailTaken         = "this email address is already registered"
-	MsgUserNotFound       = "user not found"
-	MsgUserInvalid        = "user invalid"
-	MsUserNotActive       = "Your account has not been activated. Please verify your email or contact support"
-	MsgCredentialNotFound = "email or password was wrong"
+	MsgNameEmpty          = "full name is required"
+	MsgNameTooLong        = "full name is too long"
+	MsgGenderInvalid      = "gender value is invalid"
+	MsgUserNotFound       = "user was not found"
+	MsgUserInvalid        = "invalid user"
+	MsgUserNotActive      = "your account is not active"
+	MsgCredentialNotFound = "user credentials were not found"
+	MsgInvalidCredentials = "email or password is incorrect"
+	MsgAccountLocked      = "your account is temporarily locked"
 )

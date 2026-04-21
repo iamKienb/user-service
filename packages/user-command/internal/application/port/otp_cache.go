@@ -3,8 +3,6 @@ package port
 import (
 	"context"
 	"time"
-
-	redisx "github.com/iamKienb/shopify-go-platform/redis"
 )
 
 type OTPEntry struct {
@@ -22,7 +20,6 @@ type SessionEntry struct {
 }
 
 type OTPCache interface {
-	redisx.Cache
 	SaveOTP(ctx context.Context, sessionToken string, entry OTPEntry, ttl time.Duration) error
 	GetOTP(ctx context.Context, sessionToken string) (*OTPEntry, error)
 	DeleteOTP(ctx context.Context, sessionToken string) error

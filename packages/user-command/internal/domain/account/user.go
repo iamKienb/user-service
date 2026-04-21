@@ -1,10 +1,6 @@
-package identity
+package account
 
-import (
-	"time"
-
-	"github.com/google/uuid"
-)
+import "time"
 
 type UserRole string
 
@@ -24,18 +20,6 @@ const (
 	StatusDeleted UserStatus = "DELETED"
 )
 
-type UserID struct {
-	Value uuid.UUID
-}
-
-func (id UserID) String() string {
-	return id.Value.String()
-}
-
-func NewID() UserID {
-	return UserID{uuid.Must(uuid.NewV7())}
-}
-
 type User struct {
 	ID              UserID
 	Email           string
@@ -51,28 +35,11 @@ func (u *User) IsActive() bool {
 	return u.Status == StatusActive
 }
 
-func (u *User) HasRoles() []UserRole {
-	return u.Roles
-}
-
 func (u *User) Activate() {
 	u.Status = StatusActive
-}
-
-type Credential struct {
-	UserID            UserID
-	PasswordHash      string
-	PasswordVersion   int
-	PasswordUpdatedAt time.Time
-}
-
-type Profile struct {
-	UserID      UserID
-	FullName    string
-	Gender      string
-	PhoneNumber *string
-	AvatarURL   *string
-	DateOfBirth *time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	now := time.Now().UTC()
+	u.UpdatedAt = now
+	if u.EmailVerifiedAt == nil {
+		u.EmailVerifiedAt = &now
+	}
 }

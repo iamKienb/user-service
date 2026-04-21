@@ -1,17 +1,14 @@
-package identity
+package account
 
-import (
-	"shopify-user-command-module/internal/application/shared"
-	"time"
-)
+import "time"
 
-type IdentityAggregate struct {
+type Aggregate struct {
 	User       User
 	Credential *Credential
 	Profile    *Profile
 }
 
-func NewAggregate(p NewAggregateParams) *IdentityAggregate {
+func NewAggregate(p NewAggregateParams) *Aggregate {
 	now := time.Now().UTC()
 	userID := NewID()
 	user := User{
@@ -28,7 +25,7 @@ func NewAggregate(p NewAggregateParams) *IdentityAggregate {
 	credential := Credential{
 		UserID:            userID,
 		PasswordHash:      p.PasswordHash,
-		PasswordVersion:   shared.DefaultPasswordVersion,
+		PasswordVersion:   DefaultPasswordVersion,
 		PasswordUpdatedAt: now,
 	}
 
@@ -43,17 +40,52 @@ func NewAggregate(p NewAggregateParams) *IdentityAggregate {
 		UpdatedAt:   now,
 	}
 
-	return &IdentityAggregate{
+	return &Aggregate{
 		User:       user,
 		Credential: &credential,
 		Profile:    &profile,
 	}
 }
 
-func LoadAggregate(user User, credential *Credential, profile *Profile) *IdentityAggregate {
-	return &IdentityAggregate{
+func LoadAggregate(user User, credential *Credential, profile *Profile) *Aggregate {
+	return &Aggregate{
 		User:       user,
 		Credential: credential,
 		Profile:    profile,
 	}
+}
+
+func (a *Aggregate) Activate() {
+	a.User.Activate()
+}
+
+func (a *Aggregate) EnsureCredential() error {
+	if a == nil {
+		return ErrUserNotFound
+	}
+	if a.Credential == nil {
+		return ErrCredentialNotFound
+	}
+
+	return nil
+}
+
+func (a *Aggregate) EnsureCanLogin() error {
+	if err := a.EnsureCredential(); err != nil {
+		return err
+	}
+	if !a.User.IsActive() {
+		return ErrUserNotActive
+	}
+
+	return nil
+}
+
+func (a *Aggregate) ActivateIfNeeded() bool {
+	if a.User.IsActive() {
+		return false
+	}
+
+	a.User.Activate()
+	return true
 }

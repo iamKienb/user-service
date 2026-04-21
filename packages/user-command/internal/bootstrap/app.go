@@ -74,8 +74,8 @@ func (a *App) Stop(ctx context.Context) error {
 		}
 	}
 
-	if a.infra != nil && a.infra.Pool != nil {
-		a.infra.Pool.Close()
+	if a.infra != nil && a.infra.PostgresPool != nil {
+		a.infra.PostgresPool.Close()
 	}
 
 	return nil

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/domain/identity"
 	"strings"
 
 	configx "github.com/iamKienb/shopify-go-platform/config"
@@ -42,7 +41,6 @@ func (h *argon2Hasher) Hash(plainText string) (string, error) {
 	encodedHash := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, p.Memory, p.Iterations, p.Parallelism, b64Salt, b64Hash)
 
 	return encodedHash, nil
-
 }
 
 func generateRandomBytes(n int) ([]byte, error) {
@@ -66,7 +64,8 @@ func (h *argon2Hasher) Verify(plainText, hashedText string) (bool, error) {
 	if subtle.ConstantTimeCompare(hash, otherHash) == 1 {
 		return true, nil
 	}
-	return false, identity.ErrInvalidEmailPassword
+
+	return false, nil
 }
 
 func decodeHash(encodedHash string) (p *configx.Argon2Config, salt, hash []byte, err error) {

@@ -2,51 +2,23 @@ package user
 
 import (
 	"context"
+
 	"shopify-user-command-module/internal/application/command/login_user"
 	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/domain/identity"
+	"shopify-user-command-module/internal/domain/account"
+	"shopify-user-command-module/internal/domain/auth"
 )
 
 func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login_user.Result, error) {
-	agg, err := s.repo.FindForLogin(ctx, cmd.Email)
+	agg, err := s.accountRepo.FindForAuthentication(ctx, cmd.Email)
 	if err != nil {
 		return nil, s.wrapError(err)
 	}
 	if agg == nil {
-		return nil, s.wrapError(identity.ErrUserInvalid)
+		return nil, s.wrapError(auth.ErrInvalidCredentials)
 	}
 
-	stats, err := s.repo.FindLoginStatByID(ctx, cmd.Email)
-	if err != nil {
-		return nil, s.wrapError(err)
-	}
-	if stats == nil {
-		stats = identity.NewLoginStat(agg.User.ID)
-	}
-
-	if stats != nil && !stats.IsLocked() {
-		return nil, s.wrapError(identity.ErrAccountLocked)
-	}
-
-	check, err := s.hasher.Verify(cmd.Password, agg.Credential.PasswordHash)
-	if err != nil {
-		return nil, s.wrapError(err)
-	}
-
-	if !check {
-		stats.RecordFailure()
-		if err := s.repo.SaveLoginStat(ctx, stats); err != nil {
-			return nil, s.wrapError(err)
-		}
-		return nil, s.wrapError(identity.ErrInvalidCredentials)
-	}
-
-	if !agg.User.IsActive() {
-		return nil, s.wrapError(identity.ErrUserNotActive)
-	}
-
-	stats.RecordSuccess()
-	if err := s.repo.SaveLoginStat(ctx, stats); err != nil {
+	if err := s.verifyLoginPolicy(ctx, agg, cmd.Password); err != nil {
 		return nil, s.wrapError(err)
 	}
 
@@ -55,7 +27,6 @@ func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login
 		Email:           agg.User.Email,
 		PasswordVersion: agg.Credential.PasswordVersion,
 	})
-
 	if err != nil {
 		return nil, s.wrapError(err)
 	}
@@ -66,5 +37,37 @@ func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login
 		AccessTokenExpiresAt:  tokenPair.AccessTokenExpiresAt,
 		RefreshTokenExpiresAt: tokenPair.RefreshTokenExpiresAt,
 	}, nil
+}
 
+func (s *userService) verifyLoginPolicy(ctx context.Context, agg *account.Aggregate, password string) error {
+	if err := agg.EnsureCredential(); err != nil {
+		return err
+	}
+
+	stats, err := s.authRepo.FindLoginStatByUserID(ctx, agg.User.ID.String())
+	if err != nil {
+		return err
+	}
+	if stats == nil {
+		stats = auth.NewLoginStat(agg.User.ID)
+	}
+
+	if err := stats.EnsureCanAttemptLogin(); err != nil {
+		return err
+	}
+
+	matched, err := s.hasher.Verify(password, agg.Credential.PasswordHash)
+	if err != nil || !matched {
+		stats.RecordFailure()
+		_ = s.authRepo.SaveLoginStat(ctx, stats)
+		return auth.ErrInvalidCredentials
+	}
+
+	if err := agg.EnsureCanLogin(); err != nil {
+		return err
+	}
+
+	stats.RecordSuccess()
+
+	return s.authRepo.SaveLoginStat(ctx, stats)
 }

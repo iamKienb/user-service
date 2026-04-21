@@ -5,7 +5,7 @@ import (
 	"shopify-user-command-module/internal/application/command/resend_otp"
 	"shopify-user-command-module/internal/application/command/verify_otp"
 	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/domain/identity"
+	"shopify-user-command-module/internal/domain/account"
 )
 
 type Service interface {
@@ -14,17 +14,17 @@ type Service interface {
 }
 
 type otpService struct {
-	repo      identity.Repository
-	tokenGen  port.TokenGenerator
-	otpCache  port.OTPCache
-	txManager port.TxManager
+	accountRepo account.Repository
+	tokenGen    port.TokenGenerator
+	otpCache    port.OTPCache
+	txManager   port.TxManager
 }
 
-func NewOTPService(repo identity.Repository, tokenGen port.TokenGenerator, otpCache port.OTPCache, txManager port.TxManager) Service {
+func NewOTPService(accountRepo account.Repository, tokenGen port.TokenGenerator, otpCache port.OTPCache, txManager port.TxManager) Service {
 	return &otpService{
-		repo:      repo,
-		tokenGen:  tokenGen,
-		otpCache:  otpCache,
-		txManager: txManager,
+		accountRepo: accountRepo,
+		tokenGen:    tokenGen,
+		otpCache:    otpCache,
+		txManager:   txManager,
 	}
 }

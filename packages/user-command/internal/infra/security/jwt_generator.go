@@ -62,9 +62,9 @@ func (g *JWTGenerator) sign(claims port.TokenClaims, expiryAt time.Time, secret 
 	}
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claim).SignedString([]byte(secret))
-
 	if err != nil {
 		return "", err
 	}
+
 	return token, nil
 }

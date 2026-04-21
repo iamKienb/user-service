@@ -10,21 +10,20 @@ import (
 	"connectrpc.com/connect"
 )
 
-type OTPServer struct {
+type otpServer struct {
 	verifyOTPExecutor verify_otp.Executor
 	resendOTPExecutor resend_otp.Executor
 }
 
-func NewOTPServer(verifyOTPExecutor verify_otp.Executor, resendOTPExecutor resend_otp.Executor) *OTPServer {
-	return &OTPServer{
+func NewOTPServer(verifyOTPExecutor verify_otp.Executor, resendOTPExecutor resend_otp.Executor) *otpServer {
+	return &otpServer{
 		verifyOTPExecutor: verifyOTPExecutor,
 		resendOTPExecutor: resendOTPExecutor,
 	}
 }
 
-func (s *OTPServer) Verify(ctx context.Context, req *connect.Request[otp.VerifyRequest]) (*connect.Response[otp.VerifyResponse], error) {
+func (s *otpServer) Verify(ctx context.Context, req *connect.Request[otp.VerifyRequest]) (*connect.Response[otp.VerifyResponse], error) {
 	cmd := ToVerifyCommand(req.Msg)
-
 	result, err := s.verifyOTPExecutor.Execute(ctx, cmd)
 	if err != nil {
 		return nil, err
@@ -33,9 +32,8 @@ func (s *OTPServer) Verify(ctx context.Context, req *connect.Request[otp.VerifyR
 	return connect.NewResponse(ToVerifyResponse(result)), nil
 }
 
-func (s *OTPServer) Resend(ctx context.Context, req *connect.Request[otp.ResendRequest]) (*connect.Response[otp.ResendResponse], error) {
+func (s *otpServer) Resend(ctx context.Context, req *connect.Request[otp.ResendRequest]) (*connect.Response[otp.ResendResponse], error) {
 	cmd := ToResendCommand(req.Msg)
-
 	result, err := s.resendOTPExecutor.Execute(ctx, cmd)
 	if err != nil {
 		return nil, err
@@ -44,4 +42,4 @@ func (s *OTPServer) Resend(ctx context.Context, req *connect.Request[otp.ResendR
 	return connect.NewResponse(ToResendResponse(result)), nil
 }
 
-var _ otpconnect.OTPCommandServiceHandler = (*OTPServer)(nil)
+var _ otpconnect.OTPCommandServiceHandler = (*otpServer)(nil)

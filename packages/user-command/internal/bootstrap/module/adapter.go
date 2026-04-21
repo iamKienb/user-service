@@ -3,15 +3,15 @@ package module
 import (
 	"log/slog"
 	"net/http"
+
 	"shopify-user-command-module/contract/protogen/otp/otpconnect"
 	"shopify-user-command-module/contract/protogen/user/userconnect"
-	"shopify-user-command-module/internal/adapter/otp"
-	"shopify-user-command-module/internal/adapter/user"
-
-	"github.com/iamKienb/shopify-go-platform/middleware/observability"
+	otpadapter "shopify-user-command-module/internal/adapter/otp"
+	useradapter "shopify-user-command-module/internal/adapter/user"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/grpcreflect"
+	"github.com/iamKienb/shopify-go-platform/middleware/observability"
 )
 
 type AdapterModule struct {
@@ -19,26 +19,29 @@ type AdapterModule struct {
 }
 
 func NewAdapterModule(app *ApplicationModule, logger *slog.Logger) *AdapterModule {
-	tracingInterceptor, err := observability.NewTracingInterceptor()
-	if err != nil {
-		logger.Error("failed to initialize tracing interceptor", slog.Any("error", err))
-	}
-	interceptors := connect.WithInterceptors(
-		tracingInterceptor,
+	interceptorList := []connect.Interceptor{
 		observability.LoggingInterceptor(logger),
 		observability.RecoveryInterceptor(logger),
 		observability.ValidationRequestInterceptor(),
-		observability.ValidationRequestInterceptor(),
-	)
-	mux := http.NewServeMux()
+	}
 
+	tracingInterceptor, err := observability.NewTracingInterceptor()
+	if err != nil {
+		logger.Error("failed to initialize tracing interceptor", slog.Any("error", err))
+	} else {
+		interceptorList = append([]connect.Interceptor{tracingInterceptor}, interceptorList...)
+	}
+
+	interceptors := connect.WithInterceptors(interceptorList...)
+
+	mux := http.NewServeMux()
 	reflector := grpcreflect.NewStaticReflector(
 		userconnect.UserCommandServiceName,
 		otpconnect.OTPCommandServiceName,
 	)
 
-	userServer := user.NewUserServer(app.RegisterExecutor, app.LoginExecutor)
-	otpServer := otp.NewOTPServer(app.VerifyExecutor, app.ResendExecutor)
+	userServer := useradapter.NewUserServer(app.RegisterExecutor, app.LoginExecutor)
+	otpServer := otpadapter.NewOTPServer(app.VerifyExecutor, app.ResendExecutor)
 
 	mux.Handle(userconnect.NewUserCommandServiceHandler(userServer, interceptors))
 	mux.Handle(otpconnect.NewOTPCommandServiceHandler(otpServer, interceptors))
@@ -46,7 +49,5 @@ func NewAdapterModule(app *ApplicationModule, logger *slog.Logger) *AdapterModul
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
 
-	return &AdapterModule{
-		Mux: mux,
-	}
+	return &AdapterModule{Mux: mux}
 }

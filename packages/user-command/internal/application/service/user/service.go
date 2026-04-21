@@ -5,7 +5,8 @@ import (
 	"shopify-user-command-module/internal/application/command/login_user"
 	"shopify-user-command-module/internal/application/command/register_user"
 	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/domain/identity"
+	"shopify-user-command-module/internal/domain/account"
+	"shopify-user-command-module/internal/domain/auth"
 )
 
 type Service interface {
@@ -14,7 +15,8 @@ type Service interface {
 }
 
 type userService struct {
-	repo identity.Repository
+	accountRepo account.Repository
+	authRepo    auth.Repository
 
 	userCache port.UserCache
 	otpCache  port.OTPCache
@@ -25,7 +27,8 @@ type userService struct {
 }
 
 func NewUserService(
-	repo identity.Repository,
+	accountRepo account.Repository,
+	authRepo auth.Repository,
 	userCache port.UserCache,
 	otpCache port.OTPCache,
 	tokenGen port.TokenGenerator,
@@ -33,11 +36,12 @@ func NewUserService(
 	hasher port.PasswordHasher,
 ) Service {
 	return &userService{
-		repo:      repo,
-		userCache: userCache,
-		otpCache:  otpCache,
-		tokenGen:  tokenGen,
-		txManager: txManager,
-		hasher:    hasher,
+		accountRepo: accountRepo,
+		authRepo:    authRepo,
+		userCache:   userCache,
+		otpCache:    otpCache,
+		tokenGen:    tokenGen,
+		txManager:   txManager,
+		hasher:      hasher,
 	}
 }

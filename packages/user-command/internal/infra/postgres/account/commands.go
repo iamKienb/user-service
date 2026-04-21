@@ -1,18 +1,19 @@
-package user
+package account
 
 import (
 	"context"
 	"fmt"
-	"shopify-user-command-module/internal/domain/identity"
+
+	"shopify-user-command-module/internal/domain/account"
 	"shopify-user-command-module/internal/infra/common"
 )
 
-func (r *userRepository) SaveAggregate(ctx context.Context, agg *identity.IdentityAggregate) error {
+func (r *accountRepository) SaveAggregate(ctx context.Context, agg *account.Aggregate) error {
 	q := r.getQuerier(ctx)
 
 	if err := q.InsertUser(ctx, toInfraUser(&agg.User)); err != nil {
 		if common.IsDuplicateEmail(err) {
-			return nil
+			return account.ErrEmailTaken
 		}
 		return fmt.Errorf("infra: insert user failed: %w", err)
 	}
@@ -28,17 +29,9 @@ func (r *userRepository) SaveAggregate(ctx context.Context, agg *identity.Identi
 	return nil
 }
 
-func (r *userRepository) UpdateUser(ctx context.Context, user *identity.User) error {
+func (r *accountRepository) UpdateUser(ctx context.Context, user *account.User) error {
 	if err := r.getQuerier(ctx).UpdateUser(ctx, toUpdateUserInfra(user)); err != nil {
 		return fmt.Errorf("infra: update user: %w", err)
-	}
-
-	return nil
-}
-
-func (r *userRepository) SaveLoginStat(ctx context.Context, loginStat *identity.LoginStat) error {
-	if err := r.getQuerier(ctx).SaveLoginStats(ctx, toInfraLoginStat(loginStat)); err != nil {
-		return fmt.Errorf("infra: save login stats: %w", err)
 	}
 
 	return nil

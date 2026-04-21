@@ -2,12 +2,10 @@ package port
 
 import (
 	"context"
-	"shopify-user-command-module/internal/domain/identity"
-
-	redisx "github.com/iamKienb/shopify-go-platform/redis"
+	"time"
 )
 
 type UserCache interface {
-	redisx.Cache
-	GetUserInfo(ctx context.Context, key string) (*identity.Profile, error)
+	IsEmailTaken(ctx context.Context, email string) (bool, error)
+	MarkEmailTaken(ctx context.Context, email string, ttl time.Duration) error
 }
