@@ -42,7 +42,7 @@ func (s *userService) Register(ctx context.Context, cmd register_user.Command) (
 	})
 
 	if err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
-		return s.repo.Save(ctx, agg)
+		return s.repo.SaveAggregate(ctx, agg)
 	}); err != nil {
 		return nil, s.wrapError(err)
 	}

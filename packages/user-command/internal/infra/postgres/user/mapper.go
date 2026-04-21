@@ -13,6 +13,7 @@ func toDomainUser(row repository.User) *identity.User {
 		ID:        identity.UserID{Value: row.ID.Bytes},
 		Email:     row.Email,
 		Status:    identity.UserStatus(row.Status),
+		Roles:     common.ToDomainRoles(row.Roles),
 		CreatedAt: row.CreatedAt.Time,
 		UpdatedAt: row.UpdatedAt.Time,
 	}
@@ -21,6 +22,7 @@ func toDomainUser(row repository.User) *identity.User {
 func toDomainCredential(row repository.Credential) *identity.Credential {
 	return &identity.Credential{
 		UserID:            identity.UserID{Value: row.UserID.Bytes},
+		PasswordHash:      row.PasswordHash,
 		PasswordVersion:   int(row.PasswordVersion),
 		PasswordUpdatedAt: row.PasswordUpdatedAt.Time,
 	}
@@ -36,6 +38,16 @@ func toDomainProfile(row repository.Profile) *identity.Profile {
 		DateOfBirth: &row.DateOfBirth.Time,
 		CreatedAt:   row.CreatedAt.Time,
 		UpdatedAt:   row.UpdatedAt.Time,
+	}
+}
+
+func toDomainLoginStat(row repository.LoginStat) *identity.LoginStat {
+	return &identity.LoginStat{
+		UserID:       identity.UserID{Value: row.UserID.Bytes},
+		FailedCount:  int(row.FailedCount),
+		LastFailedAt: &row.LastFailedAt.Time,
+		LockUntil:    &row.LockUntil.Time,
+		UpdatedAt:    row.UpdatedAt.Time,
 	}
 }
 
@@ -72,6 +84,16 @@ func toInfraProfile(p *identity.Profile) repository.InsertProfileParams {
 		DateOfBirth: common.ToPgDate(p.DateOfBirth),
 		CreatedAt:   common.ToPgTimeStampZ(&p.CreatedAt),
 		UpdatedAt:   common.ToPgTimeStampZ(&p.UpdatedAt),
+	}
+}
+
+func toInfraLoginStat(s *identity.LoginStat) repository.SaveLoginStatsParams {
+	return repository.SaveLoginStatsParams{
+		UserID:       common.ToPgUUID(s.UserID.Value),
+		FailedCount:  int32(s.FailedCount),
+		LockUntil:    common.ToPgTimeStampZ(s.LockUntil),
+		LastFailedAt: common.ToPgTimeStampZ(s.LastFailedAt),
+		UpdatedAt:    common.ToPgTimeStampZ(&s.UpdatedAt),
 	}
 }
 

@@ -51,6 +51,10 @@ func (u *User) IsActive() bool {
 	return u.Status == StatusActive
 }
 
+func (u *User) HasRoles() []UserRole {
+	return u.Roles
+}
+
 func (u *User) Activate() {
 	u.Status = StatusActive
 }

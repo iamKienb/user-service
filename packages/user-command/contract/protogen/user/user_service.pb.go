@@ -24,20 +24,25 @@ var File_user_user_service_proto protoreflect.FileDescriptor
 
 const file_user_user_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17user/user_service.proto\x12\auser.v1\x1a\x0fuser/user.proto2U\n" +
+	"\x17user/user_service.proto\x12\auser.v1\x1a\x0fuser/user.proto2\x8d\x01\n" +
 	"\x12UserCommandService\x12?\n" +
-	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x19.user.v1.RegisterResponse2\x12\n" +
+	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x19.user.v1.RegisterResponse\x126\n" +
+	"\x05Login\x12\x15.user.v1.LoginRequest\x1a\x16.user.v1.LoginResponse2\x12\n" +
 	"\x10UserQueryServiceB4Z2shopify-user-command-module/contract/protogen/userb\x06proto3"
 
 var file_user_user_service_proto_goTypes = []any{
 	(*RegisterRequest)(nil),  // 0: user.v1.RegisterRequest
-	(*RegisterResponse)(nil), // 1: user.v1.RegisterResponse
+	(*LoginRequest)(nil),     // 1: user.v1.LoginRequest
+	(*RegisterResponse)(nil), // 2: user.v1.RegisterResponse
+	(*LoginResponse)(nil),    // 3: user.v1.LoginResponse
 }
 var file_user_user_service_proto_depIdxs = []int32{
 	0, // 0: user.v1.UserCommandService.Register:input_type -> user.v1.RegisterRequest
-	1, // 1: user.v1.UserCommandService.Register:output_type -> user.v1.RegisterResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	1, // 1: user.v1.UserCommandService.Login:input_type -> user.v1.LoginRequest
+	2, // 2: user.v1.UserCommandService.Register:output_type -> user.v1.RegisterResponse
+	3, // 3: user.v1.UserCommandService.Login:output_type -> user.v1.LoginResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

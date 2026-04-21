@@ -32,7 +32,6 @@ const (
 
 func (c *otpCache) SaveOTP(ctx context.Context, sessionToken string, otp port.OTPEntry, ttl time.Duration) error {
 	key := fmt.Sprintf(otpKey, sessionToken)
-	fmt.Println("SAVE OTP", key)
 	if err := c.Set(ctx, key, otp, ttl); err != nil {
 		return fmt.Errorf("redis: set otp: %w", err)
 	}

@@ -7,10 +7,10 @@ option go_package = "shopify-user-command-module/contract/protogen/otp";
 
 // OTPCommandService provides commands for user management.
 service OTPCommandService {
-  //  Verify otp in the system.
+  //  Verify otp.
   rpc Verify(VerifyRequest) returns (VerifyResponse);
   
-  // Resend otp in the system
+  // Resend otp.
   rpc Resend(ResendRequest) returns (ResendResponse);
 }
 

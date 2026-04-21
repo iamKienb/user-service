@@ -7,8 +7,11 @@ option go_package = "shopify-user-command-module/contract/protogen/user";
 
 // UserCommandService provides commands for user management.
 service UserCommandService {
-  //  registers a new user in the system.
+  //  registers user.
   rpc Register(RegisterRequest) returns (RegisterResponse);
+
+  // login user.
+  rpc Login(LoginRequest) returns (LoginResponse);
 }
 
 // UserQueryService provides queries for service call.

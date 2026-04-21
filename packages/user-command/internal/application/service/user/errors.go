@@ -8,9 +8,10 @@ import (
 )
 
 var userErrorMap = app_error.ServiceErrorMap{
-	identity.ErrEmailTaken:   {Kind: app_error.KindConflict, Msg: i18n.MsgEmailTaken},
-	identity.ErrUserNotFound: {Kind: app_error.KindNotFound, Msg: i18n.MsgUserNotFound},
-	identity.ErrUserInvalid:  {Kind: app_error.KindValidation, Msg: i18n.MsgUserInvalid},
+	identity.ErrEmailTaken:         {Kind: app_error.KindConflict, Msg: i18n.MsgEmailTaken},
+	identity.ErrUserNotFound:       {Kind: app_error.KindNotFound, Msg: i18n.MsgUserNotFound},
+	identity.ErrUserInvalid:        {Kind: app_error.KindValidation, Msg: i18n.MsgUserInvalid},
+	identity.ErrCredentialNotFound: {Kind: app_error.KindNotFound, Msg: i18n.MsgCredentialNotFound},
 }
 
 func (s *userService) wrapError(err error) error {

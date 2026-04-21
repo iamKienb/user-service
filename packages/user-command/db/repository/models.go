@@ -32,12 +32,11 @@ type Credential struct {
 }
 
 type LoginStat struct {
-	UserID            pgtype.UUID
-	LastLoginAt       pgtype.Timestamptz
-	FailedLoginCount  int32
-	LastFailedLoginAt pgtype.Timestamptz
-	LockUntil         pgtype.Timestamptz
-	UpdatedAt         pgtype.Timestamptz
+	UserID       pgtype.UUID
+	FailedCount  int32
+	LockUntil    pgtype.Timestamptz
+	LastFailedAt pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
 }
 
 type Outbox struct {

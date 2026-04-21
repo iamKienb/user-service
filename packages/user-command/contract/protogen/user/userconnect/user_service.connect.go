@@ -38,12 +38,17 @@ const (
 	// UserCommandServiceRegisterProcedure is the fully-qualified name of the UserCommandService's
 	// Register RPC.
 	UserCommandServiceRegisterProcedure = "/user.v1.UserCommandService/Register"
+	// UserCommandServiceLoginProcedure is the fully-qualified name of the UserCommandService's Login
+	// RPC.
+	UserCommandServiceLoginProcedure = "/user.v1.UserCommandService/Login"
 )
 
 // UserCommandServiceClient is a client for the user.v1.UserCommandService service.
 type UserCommandServiceClient interface {
-	// registers a new user in the system.
+	// registers user.
 	Register(context.Context, *connect.Request[user.RegisterRequest]) (*connect.Response[user.RegisterResponse], error)
+	// login user.
+	Login(context.Context, *connect.Request[user.LoginRequest]) (*connect.Response[user.LoginResponse], error)
 }
 
 // NewUserCommandServiceClient constructs a client for the user.v1.UserCommandService service. By
@@ -63,12 +68,19 @@ func NewUserCommandServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(userCommandServiceMethods.ByName("Register")),
 			connect.WithClientOptions(opts...),
 		),
+		login: connect.NewClient[user.LoginRequest, user.LoginResponse](
+			httpClient,
+			baseURL+UserCommandServiceLoginProcedure,
+			connect.WithSchema(userCommandServiceMethods.ByName("Login")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // userCommandServiceClient implements UserCommandServiceClient.
 type userCommandServiceClient struct {
 	register *connect.Client[user.RegisterRequest, user.RegisterResponse]
+	login    *connect.Client[user.LoginRequest, user.LoginResponse]
 }
 
 // Register calls user.v1.UserCommandService.Register.
@@ -76,10 +88,17 @@ func (c *userCommandServiceClient) Register(ctx context.Context, req *connect.Re
 	return c.register.CallUnary(ctx, req)
 }
 
+// Login calls user.v1.UserCommandService.Login.
+func (c *userCommandServiceClient) Login(ctx context.Context, req *connect.Request[user.LoginRequest]) (*connect.Response[user.LoginResponse], error) {
+	return c.login.CallUnary(ctx, req)
+}
+
 // UserCommandServiceHandler is an implementation of the user.v1.UserCommandService service.
 type UserCommandServiceHandler interface {
-	// registers a new user in the system.
+	// registers user.
 	Register(context.Context, *connect.Request[user.RegisterRequest]) (*connect.Response[user.RegisterResponse], error)
+	// login user.
+	Login(context.Context, *connect.Request[user.LoginRequest]) (*connect.Response[user.LoginResponse], error)
 }
 
 // NewUserCommandServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -95,10 +114,18 @@ func NewUserCommandServiceHandler(svc UserCommandServiceHandler, opts ...connect
 		connect.WithSchema(userCommandServiceMethods.ByName("Register")),
 		connect.WithHandlerOptions(opts...),
 	)
+	userCommandServiceLoginHandler := connect.NewUnaryHandler(
+		UserCommandServiceLoginProcedure,
+		svc.Login,
+		connect.WithSchema(userCommandServiceMethods.ByName("Login")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/user.v1.UserCommandService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case UserCommandServiceRegisterProcedure:
 			userCommandServiceRegisterHandler.ServeHTTP(w, r)
+		case UserCommandServiceLoginProcedure:
+			userCommandServiceLoginHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -110,6 +137,10 @@ type UnimplementedUserCommandServiceHandler struct{}
 
 func (UnimplementedUserCommandServiceHandler) Register(context.Context, *connect.Request[user.RegisterRequest]) (*connect.Response[user.RegisterResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("user.v1.UserCommandService.Register is not implemented"))
+}
+
+func (UnimplementedUserCommandServiceHandler) Login(context.Context, *connect.Request[user.LoginRequest]) (*connect.Response[user.LoginResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("user.v1.UserCommandService.Login is not implemented"))
 }
 
 // UserQueryServiceClient is a client for the user.v1.UserQueryService service.

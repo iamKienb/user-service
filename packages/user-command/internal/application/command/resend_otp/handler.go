@@ -6,20 +6,21 @@ type otpService interface {
 	Resend(ctx context.Context, cmd Command) (*Result, error)
 }
 
-type Handler struct {
+type handler struct {
 	service otpService
 }
 
 func NewHandler(service otpService) Executor {
-	return &Handler{
+	return &handler{
 		service: service,
 	}
 }
 
-func (h *Handler) Execute(ctx context.Context, cmd Command) (*Result, error) {
+func (h *handler) Execute(ctx context.Context, cmd Command) (*Result, error) {
 	result, err := h.service.Resend(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }

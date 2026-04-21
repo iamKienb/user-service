@@ -43,7 +43,7 @@ func NewInfraModule(ctx context.Context, cfg *config.UserCommandConfig) (*InfraM
 
 	txManager := postgresx.NewTxManager(pgClient.Pool)
 
-	agronHasher := security.NewArgon2Hasher(cfg.Argon2)
+	argonHasher := security.NewArgon2Hasher(cfg.Argon2)
 
 	jwtGenerator := security.NewJWTGenerator(cfg.Jwt)
 
@@ -53,7 +53,7 @@ func NewInfraModule(ctx context.Context, cfg *config.UserCommandConfig) (*InfraM
 		Cache:          userCache,
 		OtpCache:       otpCache,
 		TxManager:      txManager,
-		Hasher:         agronHasher,
+		Hasher:         argonHasher,
 		TokenGenerator: jwtGenerator,
 	}, nil
 

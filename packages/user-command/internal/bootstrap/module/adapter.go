@@ -37,7 +37,7 @@ func NewAdapterModule(app *ApplicationModule, logger *slog.Logger) *AdapterModul
 		otpconnect.OTPCommandServiceName,
 	)
 
-	userServer := user.NewUserServer(app.RegisterExecutor)
+	userServer := user.NewUserServer(app.RegisterExecutor, app.LoginExecutor)
 	otpServer := otp.NewOTPServer(app.VerifyExecutor, app.ResendExecutor)
 
 	mux.Handle(userconnect.NewUserCommandServiceHandler(userServer, interceptors))
