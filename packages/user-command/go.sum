@@ -38,6 +38,8 @@ github.com/iamKienb/shopify-go-platform v0.3.2 h1:MOc3kwtnDrzHBvANt/fFMaW24yiLWw
 github.com/iamKienb/shopify-go-platform v0.3.2/go.mod h1:WhwmecC+ywF/Ma1H6EPUARBOS6s9gJ8XZLjg1yo+E4g=
 github.com/iamKienb/shopify-go-platform v0.3.3 h1:tMunGaRbt2b/ckXRrTc0NjPOWY9o7dK3WfuvrySWZUw=
 github.com/iamKienb/shopify-go-platform v0.3.3/go.mod h1:WhwmecC+ywF/Ma1H6EPUARBOS6s9gJ8XZLjg1yo+E4g=
+github.com/iamKienb/shopify-go-platform v0.3.4 h1:VCwAuIeDObdacVNI1KzHNRmriqqX1/Zlk45uspCj+EQ=
+github.com/iamKienb/shopify-go-platform v0.3.4/go.mod h1:WhwmecC+ywF/Ma1H6EPUARBOS6s9gJ8XZLjg1yo+E4g=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=

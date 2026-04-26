@@ -31,10 +31,11 @@ func NewAdapterModule(app *ApplicationModule, logger *slog.Logger) *AdapterModul
 
 	interceptors = append(interceptors,
 		observabilityx.RecoveryInterceptor(logger),
+		authx.RequestContextInterceptor(),
 		authx.AuthInternalInterceptor(),
 		observabilityx.LoggingInterceptor(logger),
 		observabilityx.ValidationRequestInterceptor(),
-		observabilityx.ErrorResponseInterceptor(),
+		observabilityx.ErrorResponseInterceptor(logger),
 	)
 
 	allInterceptors := connect.WithInterceptors(interceptors...)

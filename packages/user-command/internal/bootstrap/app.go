@@ -36,6 +36,9 @@ func (a *App) Start(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
 	}
+	if cfg == nil || cfg.Server.GrpcPort == 0 {
+		return fmt.Errorf("config is empty: check your .env file path")
+	}
 
 	infra, err := module.NewInfraModule(ctx, cfg)
 	if err != nil {
