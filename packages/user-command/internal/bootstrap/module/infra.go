@@ -26,7 +26,7 @@ type InfraModule struct {
 	OtpCache       port.OTPCache
 	TxManager      port.TxManager
 	Hasher         port.PasswordHasher
-	TokenGenerator port.TokenGenerator
+	TokenGenerator port.TokenService
 }
 
 func NewInfraModule(ctx context.Context, cfg *config.UserCommandConfig) (*InfraModule, error) {
@@ -48,6 +48,6 @@ func NewInfraModule(ctx context.Context, cfg *config.UserCommandConfig) (*InfraM
 		OtpCache:       cache.NewOTPCache(redisClient.Conn),
 		TxManager:      postgresx.NewTxManager(pgClient.Pool),
 		Hasher:         security.NewArgon2Hasher(cfg.Argon2),
-		TokenGenerator: security.NewJWTGenerator(cfg.Jwt),
+		TokenGenerator: security.NewTokenGenerator(cfg.Jwt),
 	}, nil
 }

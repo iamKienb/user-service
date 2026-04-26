@@ -1,10 +1,10 @@
 package user
 
 import (
-	"shopify-user-command-module/contract/protogen/user"
 	"shopify-user-command-module/internal/application/command/login_user"
 	"shopify-user-command-module/internal/application/command/register_user"
 
+	"github.com/iamKienb/shopify-go-api/gen/user"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

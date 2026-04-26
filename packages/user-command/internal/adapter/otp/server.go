@@ -2,12 +2,12 @@ package otp
 
 import (
 	"context"
-	"shopify-user-command-module/contract/protogen/otp"
-	"shopify-user-command-module/contract/protogen/otp/otpconnect"
 	"shopify-user-command-module/internal/application/command/resend_otp"
 	"shopify-user-command-module/internal/application/command/verify_otp"
 
 	"connectrpc.com/connect"
+	otpv1 "github.com/iamKienb/shopify-go-api/gen/otp"
+	"github.com/iamKienb/shopify-go-api/gen/otp/otpconnect"
 )
 
 type otpServer struct {
@@ -22,7 +22,7 @@ func NewOTPServer(verifyOTPExecutor verify_otp.Executor, resendOTPExecutor resen
 	}
 }
 
-func (s *otpServer) Verify(ctx context.Context, req *connect.Request[otp.VerifyRequest]) (*connect.Response[otp.VerifyResponse], error) {
+func (s *otpServer) Verify(ctx context.Context, req *connect.Request[otpv1.VerifyRequest]) (*connect.Response[otpv1.VerifyResponse], error) {
 	cmd := ToVerifyCommand(req.Msg)
 	result, err := s.verifyOTPExecutor.Execute(ctx, cmd)
 	if err != nil {
@@ -32,7 +32,7 @@ func (s *otpServer) Verify(ctx context.Context, req *connect.Request[otp.VerifyR
 	return connect.NewResponse(ToVerifyResponse(result)), nil
 }
 
-func (s *otpServer) Resend(ctx context.Context, req *connect.Request[otp.ResendRequest]) (*connect.Response[otp.ResendResponse], error) {
+func (s *otpServer) Resend(ctx context.Context, req *connect.Request[otpv1.ResendRequest]) (*connect.Response[otpv1.ResendResponse], error) {
 	cmd := ToResendCommand(req.Msg)
 	result, err := s.resendOTPExecutor.Execute(ctx, cmd)
 	if err != nil {

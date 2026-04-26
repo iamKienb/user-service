@@ -2,13 +2,12 @@ package user
 
 import (
 	"context"
-
-	userv1 "shopify-user-command-module/contract/protogen/user"
-	"shopify-user-command-module/contract/protogen/user/userconnect"
 	"shopify-user-command-module/internal/application/command/login_user"
 	"shopify-user-command-module/internal/application/command/register_user"
 
 	"connectrpc.com/connect"
+	userv1 "github.com/iamKienb/shopify-go-api/gen/user"
+	"github.com/iamKienb/shopify-go-api/gen/user/userconnect"
 )
 
 type userServer struct {

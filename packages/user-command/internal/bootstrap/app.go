@@ -42,6 +42,7 @@ func (a *App) Start(ctx context.Context) error {
 		return fmt.Errorf("infra: %w", err)
 	}
 	a.infra = infra
+
 	application := module.NewApplicationModule(infra)
 	adapter := module.NewAdapterModule(application, a.logger)
 
@@ -62,7 +63,6 @@ func (a *App) Start(ctx context.Context) error {
 	}
 
 	return nil
-
 }
 
 func (a *App) Stop(ctx context.Context) error {

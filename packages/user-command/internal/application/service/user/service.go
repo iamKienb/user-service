@@ -21,7 +21,7 @@ type userService struct {
 	userCache port.UserCache
 	otpCache  port.OTPCache
 
-	tokenGen  port.TokenGenerator
+	tokenGen  port.TokenService
 	txManager port.TxManager
 	hasher    port.PasswordHasher
 }
@@ -31,7 +31,7 @@ func NewUserService(
 	authRepo auth.Repository,
 	userCache port.UserCache,
 	otpCache port.OTPCache,
-	tokenGen port.TokenGenerator,
+	tokenGen port.TokenService,
 	txManager port.TxManager,
 	hasher port.PasswordHasher,
 ) Service {

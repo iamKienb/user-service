@@ -1,12 +1,14 @@
 package port
 
 import (
+	"shopify-user-command-module/internal/domain/account"
 	"time"
 )
 
-type TokenClaims struct {
-	UserId          string
+type UserClaims struct {
+	UserID          string
 	Email           string
+	Roles           []account.UserRole
 	PasswordVersion int
 }
 
@@ -17,6 +19,6 @@ type TokenPair struct {
 	RefreshTokenExpiresAt time.Time
 }
 
-type TokenGenerator interface {
-	GeneratePair(claims TokenClaims) (*TokenPair, error)
+type TokenService interface {
+	GeneratePair(claims UserClaims) (*TokenPair, error)
 }

@@ -4,14 +4,15 @@ import (
 	"log/slog"
 	"net/http"
 
-	"shopify-user-command-module/contract/protogen/otp/otpconnect"
-	"shopify-user-command-module/contract/protogen/user/userconnect"
 	otpadapter "shopify-user-command-module/internal/adapter/otp"
 	useradapter "shopify-user-command-module/internal/adapter/user"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/grpcreflect"
-	"github.com/iamKienb/shopify-go-platform/middleware/observability"
+	"github.com/iamKienb/shopify-go-api/gen/otp/otpconnect"
+	"github.com/iamKienb/shopify-go-api/gen/user/userconnect"
+	authx "github.com/iamKienb/shopify-go-platform/middleware/auth"
+	observabilityx "github.com/iamKienb/shopify-go-platform/middleware/observability"
 )
 
 type AdapterModule struct {
@@ -19,20 +20,24 @@ type AdapterModule struct {
 }
 
 func NewAdapterModule(app *ApplicationModule, logger *slog.Logger) *AdapterModule {
-	interceptorList := []connect.Interceptor{
-		observability.LoggingInterceptor(logger),
-		observability.RecoveryInterceptor(logger),
-		observability.ValidationRequestInterceptor(),
-	}
+	var interceptors []connect.Interceptor
 
-	tracingInterceptor, err := observability.NewTracingInterceptor()
+	tracingInterceptor, err := observabilityx.TracingInterceptor()
 	if err != nil {
 		logger.Error("failed to initialize tracing interceptor", slog.Any("error", err))
 	} else {
-		interceptorList = append([]connect.Interceptor{tracingInterceptor}, interceptorList...)
+		interceptors = append(interceptors, tracingInterceptor)
 	}
 
-	interceptors := connect.WithInterceptors(interceptorList...)
+	interceptors = append(interceptors,
+		observabilityx.RecoveryInterceptor(logger),
+		authx.AuthInternalInterceptor(),
+		observabilityx.LoggingInterceptor(logger),
+		observabilityx.ValidationRequestInterceptor(),
+		observabilityx.ErrorResponseInterceptor(),
+	)
+
+	allInterceptors := connect.WithInterceptors(interceptors...)
 
 	mux := http.NewServeMux()
 	reflector := grpcreflect.NewStaticReflector(
@@ -43,8 +48,8 @@ func NewAdapterModule(app *ApplicationModule, logger *slog.Logger) *AdapterModul
 	userServer := useradapter.NewUserServer(app.RegisterExecutor, app.LoginExecutor)
 	otpServer := otpadapter.NewOTPServer(app.VerifyExecutor, app.ResendExecutor)
 
-	mux.Handle(userconnect.NewUserCommandServiceHandler(userServer, interceptors))
-	mux.Handle(otpconnect.NewOTPCommandServiceHandler(otpServer, interceptors))
+	mux.Handle(userconnect.NewUserCommandServiceHandler(userServer, allInterceptors))
+	mux.Handle(otpconnect.NewOTPCommandServiceHandler(otpServer, allInterceptors))
 
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))

@@ -15,12 +15,12 @@ type Service interface {
 
 type otpService struct {
 	accountRepo account.Repository
-	tokenGen    port.TokenGenerator
+	tokenGen    port.TokenService
 	otpCache    port.OTPCache
 	txManager   port.TxManager
 }
 
-func NewOTPService(accountRepo account.Repository, tokenGen port.TokenGenerator, otpCache port.OTPCache, txManager port.TxManager) Service {
+func NewOTPService(accountRepo account.Repository, tokenGen port.TokenService, otpCache port.OTPCache, txManager port.TxManager) Service {
 	return &otpService{
 		accountRepo: accountRepo,
 		tokenGen:    tokenGen,

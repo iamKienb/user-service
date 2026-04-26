@@ -22,9 +22,10 @@ func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login
 		return nil, s.wrapError(err)
 	}
 
-	tokenPair, err := s.tokenGen.GeneratePair(port.TokenClaims{
-		UserId:          agg.User.ID.String(),
+	tokenPair, err := s.tokenGen.GeneratePair(port.UserClaims{
+		UserID:          agg.User.ID.String(),
 		Email:           agg.User.Email,
+		Roles:           agg.User.Roles,
 		PasswordVersion: agg.Credential.PasswordVersion,
 	})
 	if err != nil {
