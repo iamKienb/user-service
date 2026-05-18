@@ -1,0 +1,189 @@
+{
+    "settings": {
+        "number_of_shards": 2,
+        "number_of_replicas": 1,
+        "analysis": {
+            "normalizer": {
+                "standard_normalizer": {
+                    "type": "custom",
+                    "filter": [
+                        "lowercase",
+                        "asciifolding"
+                    ]
+                }
+            },
+            "analyzer": {
+                "standard_ascii": {
+                    "tokenizer": "icu_tokenizer",
+                    "filter": [
+                        "lowercase",
+                        "icu_folding",
+                        "icu_normalizer"
+                    ]
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "id": {
+                "type": "keyword"
+            },
+            "email": {
+                "type": "keyword",
+                "normalizer": "standard_normalizer"
+            },
+            "status": {
+                "type": "keyword",
+                "normalizer": "standard_normalizer"
+            },
+            "roles": {
+                "type": "keyword",
+                "normalizer": "standard_normalizer"
+            },
+            "created_at": {
+                "type": "date"
+            },
+            "updated_at": {
+                "type": "date"
+            },
+            "profile": {
+                "properties": {
+                    "user_id": {
+                        "type": "keyword"
+                    },
+                    "full_name": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "gender": {
+                        "type": "keyword",
+                        "normalizer": "standard_normalizer"
+                    },
+                    "phone_number": {
+                        "type": "keyword"
+                    },
+                    "avatar_url": {
+                        "type": "keyword"
+                    },
+                    "date_of_birth": {
+                        "type": "date"
+                    },
+                    "created_at": {
+                        "type": "date"
+                    },
+                    "updated_at": {
+                        "type": "date"
+                    }
+                }
+            },
+            "address": {
+                "type": "nested",
+                "properties": {
+                    "id": {
+                        "type": "keyword"
+                    },
+                    "user_id": {
+                        "type": "keyword"
+                    },
+                    "full_address": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "country": {
+                        "properties": {
+                            "country_id": {
+                                "type": "keyword"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "city": {
+                        "properties": {
+                            "city_id": {
+                                "type": "keyword"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "district": {
+                        "properties": {
+                            "district_id": {
+                                "type": "keyword"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "ward": {
+                        "properties": {
+                            "ward_id": {
+                                "type": "keyword"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "address_line": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "receiver_name": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "phone_number": {
+                        "type": "keyword"
+                    },
+                    "label": {
+                        "type": "keyword",
+                        "normalizer": "standard_normalizer"
+                    },
+                    "is_default": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "date"
+                    },
+                    "updated_at": {
+                        "type:": "date"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -4,34 +4,33 @@ import (
 	"context"
 	"fmt"
 	"time"
-
-	"shopify-user-command-module/internal/application/port"
+	"user-command-module/internal/application/port"
 
 	redisx "github.com/iamKienb/shopify-go-platform/redis"
 	"github.com/redis/go-redis/v9"
 )
 
 const (
-	otpKey     = "user-command:otp:%s"
-	sessionKey = "user-command:session:%s"
-	resendKey  = "user-command:resend:%s"
+	otpKey     = "user-command:otp:key:%s"
+	sessionKey = "user-command:otp:session:%s"
+	resendKey  = "user-command:otp:resend:%s"
 )
 
 type otpCache struct {
-	cache  redisx.Cache
-	client *redis.Client
+	service redisx.RedisXService
+	client  *redis.Client
 }
 
-func NewOTPCache(client *redis.Client) port.OTPCache {
+func NewOTPCache(service redisx.RedisXService) port.OTPCache {
 	return &otpCache{
-		cache:  redisx.NewRedisService(client),
-		client: client,
+		service: service,
+		client:  service.GetClient(),
 	}
 }
 
 func (c *otpCache) SaveOTP(ctx context.Context, sessionToken string, otp port.OTPEntry, ttl time.Duration) error {
 	key := fmt.Sprintf(otpKey, sessionToken)
-	if err := c.cache.Set(ctx, key, otp, ttl); err != nil {
+	if err := c.service.Set(ctx, key, otp, ttl); err != nil {
 		return fmt.Errorf("redis: set otp: %w", err)
 	}
 
@@ -41,7 +40,7 @@ func (c *otpCache) SaveOTP(ctx context.Context, sessionToken string, otp port.OT
 func (c *otpCache) GetOTP(ctx context.Context, sessionToken string) (*port.OTPEntry, error) {
 	key := fmt.Sprintf(otpKey, sessionToken)
 	var otp port.OTPEntry
-	if err := c.cache.Get(ctx, key, &otp); err != nil {
+	if err := c.service.Get(ctx, key, &otp); err != nil {
 		if err == redis.Nil {
 			return nil, nil
 		}
@@ -53,7 +52,7 @@ func (c *otpCache) GetOTP(ctx context.Context, sessionToken string) (*port.OTPEn
 
 func (c *otpCache) DeleteOTP(ctx context.Context, sessionToken string) error {
 	key := fmt.Sprintf(otpKey, sessionToken)
-	if err := c.cache.Delete(ctx, key); err != nil {
+	if err := c.service.Delete(ctx, key); err != nil {
 		return fmt.Errorf("redis: delete otp: %w", err)
 	}
 
@@ -62,7 +61,7 @@ func (c *otpCache) DeleteOTP(ctx context.Context, sessionToken string) error {
 
 func (c *otpCache) SaveSession(ctx context.Context, sessionToken string, session port.SessionEntry, ttl time.Duration) error {
 	key := fmt.Sprintf(sessionKey, sessionToken)
-	if err := c.cache.Set(ctx, key, session, ttl); err != nil {
+	if err := c.service.Set(ctx, key, session, ttl); err != nil {
 		return fmt.Errorf("redis: set session: %w", err)
 	}
 
@@ -72,7 +71,7 @@ func (c *otpCache) SaveSession(ctx context.Context, sessionToken string, session
 func (c *otpCache) GetSession(ctx context.Context, sessionToken string) (*port.SessionEntry, error) {
 	key := fmt.Sprintf(sessionKey, sessionToken)
 	var session port.SessionEntry
-	if err := c.cache.Get(ctx, key, &session); err != nil {
+	if err := c.service.Get(ctx, key, &session); err != nil {
 		if err == redis.Nil {
 			return nil, nil
 		}
@@ -84,7 +83,7 @@ func (c *otpCache) GetSession(ctx context.Context, sessionToken string) (*port.S
 
 func (c *otpCache) DeleteSession(ctx context.Context, sessionToken string) error {
 	key := fmt.Sprintf(sessionKey, sessionToken)
-	if err := c.cache.Delete(ctx, key); err != nil {
+	if err := c.service.Delete(ctx, key); err != nil {
 		return fmt.Errorf("redis: delete session: %w", err)
 	}
 

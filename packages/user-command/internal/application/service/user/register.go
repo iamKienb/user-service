@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"shopify-user-command-module/internal/application/command/register_user"
-	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/application/shared"
-	"shopify-user-command-module/internal/domain/account"
+	"user-command-module/internal/application/command/register_user"
+	"user-command-module/internal/application/port"
+	"user-command-module/internal/application/shared"
+	domain_shared "user-command-module/internal/domain/shared"
+
+	"user-command-module/internal/domain/account"
 
 	"github.com/google/uuid"
 )
@@ -23,20 +25,35 @@ func (s *userService) Register(ctx context.Context, cmd register_user.Command) (
 		return nil, s.wrapError(err)
 	}
 
-	validGender, err := account.ValidateGender(cmd.Gender)
+	validGender, err := domain_shared.ValidateEnum[account.GenderEnum](cmd.Profile.Gender, account.ErrGenderInvalid)
 	if err != nil {
 		return nil, s.wrapError(err)
 	}
 
-	agg := account.NewAggregate(account.NewAggregateParams{
+	agg := account.NewAggregate(account.AggregateParams{
 		Email:        cmd.Email,
 		PasswordHash: passwordHash,
-		FullName:     cmd.FullName,
+		FullName:     cmd.Profile.FullName,
 		Gender:       validGender,
 	})
 
-	if err := s.txManager.WithTx(ctx, func(txCtx context.Context) error {
-		return s.accountRepo.SaveAggregate(txCtx, agg)
+	if err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
+		if err := s.accountRepo.SaveAggregate(ctx, agg); err != nil {
+			return err
+		}
+
+		events := agg.FlushEvents()
+		if len(events) == 0 {
+			return nil
+		}
+
+		outboxParam := port.OutboxParam{
+			AggregateID:   agg.User.ID.RawID(),
+			AggregateType: account.AggregateTypeUser,
+			Events:        events,
+		}
+
+		return s.outboxService.Publish(ctx, outboxParam)
 	}); err != nil {
 		return nil, s.wrapError(err)
 	}

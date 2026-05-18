@@ -1,35 +1,44 @@
 package account
 
-import "time"
+import (
+	"time"
+	"user-command-module/internal/domain/shared"
+)
+
+const AggregateTypeUser = "USER"
 
 type Aggregate struct {
 	User       User
-	Credential *Credential
-	Profile    *Profile
+	Credential *UserCredential
+	Profile    *UserProfile
+	Events     []shared.DomainEvent
 }
 
-func NewAggregate(p NewAggregateParams) *Aggregate {
+func NewAggregate(p AggregateParams) *Aggregate {
 	now := time.Now().UTC()
-	userID := NewID()
+
+	userID := shared.NewID[shared.UserID]()
+	roles := []RoleEnum{RoleCustomer}
+
 	user := User{
 		ID:              userID,
 		Email:           p.Email,
 		EmailVerifiedAt: nil,
 		Status:          StatusPending,
-		Roles:           []UserRole{RoleCustomer},
+		Roles:           roles,
 		CreatedAt:       now,
-		UpdatedAt:       now,
+		UpdatedAt:       nil,
 		DeletedAt:       nil,
 	}
 
-	credential := Credential{
+	credential := UserCredential{
 		UserID:            userID,
 		PasswordHash:      p.PasswordHash,
 		PasswordVersion:   DefaultPasswordVersion,
 		PasswordUpdatedAt: now,
 	}
 
-	profile := Profile{
+	profile := UserProfile{
 		UserID:      userID,
 		FullName:    p.FullName,
 		Gender:      p.Gender,
@@ -37,17 +46,29 @@ func NewAggregate(p NewAggregateParams) *Aggregate {
 		AvatarURL:   nil,
 		DateOfBirth: nil,
 		CreatedAt:   now,
-		UpdatedAt:   now,
+		UpdatedAt:   nil,
 	}
 
-	return &Aggregate{
+	aggregate := &Aggregate{
 		User:       user,
 		Credential: &credential,
 		Profile:    &profile,
 	}
+
+	aggregate.User.EventEntity.AddEvent(UserRegisteredEvent{
+		UserID:    userID,
+		Email:     aggregate.User.Email,
+		Status:    aggregate.User.Status,
+		Roles:     aggregate.User.Roles,
+		FullName:  aggregate.Profile.FullName,
+		Gender:    aggregate.Profile.Gender,
+		CreatedAt: aggregate.User.CreatedAt,
+	})
+
+	return aggregate
 }
 
-func LoadAggregate(user User, credential *Credential, profile *Profile) *Aggregate {
+func LoadAggregate(user User, credential *UserCredential, profile *UserProfile) *Aggregate {
 	return &Aggregate{
 		User:       user,
 		Credential: credential,
@@ -55,8 +76,15 @@ func LoadAggregate(user User, credential *Credential, profile *Profile) *Aggrega
 	}
 }
 
-func (a *Aggregate) Activate() {
-	a.User.Activate()
+func (a *Aggregate) FlushEvents() []shared.DomainEvent {
+	var allEvents []shared.DomainEvent
+	if len(a.Events) > 0 {
+		allEvents = append(allEvents, a.Events...)
+		a.Events = nil
+	}
+
+	allEvents = append(allEvents, a.User.EventEntity.Flush()...)
+	return allEvents
 }
 
 func (a *Aggregate) EnsureCredential() error {
@@ -70,7 +98,7 @@ func (a *Aggregate) EnsureCredential() error {
 	return nil
 }
 
-func (a *Aggregate) EnsureCanLogin() error {
+func (a *Aggregate) CheckActiveIfLogin() error {
 	if err := a.EnsureCredential(); err != nil {
 		return err
 	}
@@ -81,11 +109,18 @@ func (a *Aggregate) EnsureCanLogin() error {
 	return nil
 }
 
-func (a *Aggregate) ActivateIfNeeded() bool {
+func (a *Aggregate) ActivateIfVerified() bool {
 	if a.User.IsActive() {
 		return false
 	}
 
 	a.User.Activate()
+
+	a.User.EventEntity.AddEvent(UserActivatedEvent{
+		UserID:    a.User.ID,
+		Status:    a.User.Status,
+		UpdatedAt: a.User.UpdatedAt,
+	})
+
 	return true
 }

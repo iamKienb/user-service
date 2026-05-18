@@ -15,4 +15,6 @@ var (
 	ErrProfileNotFound = errors.New("profile_not_found")
 
 	ErrCredentialNotFound = errors.New("credential_not_found")
+
+	ErrMaxAddressReached = errors.New("only had create 5 address")
 )

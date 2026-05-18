@@ -1,0 +1,5 @@
+CREATE TABLE shop_roles (
+    id SERIAL PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL UNIQUE
+);

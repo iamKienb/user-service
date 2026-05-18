@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
-	"shopify-user-command-module/internal/bootstrap/config"
-	"shopify-user-command-module/internal/bootstrap/module"
 	"strconv"
 	"time"
+	"user-command-module/internal/bootstrap/config"
+	"user-command-module/internal/bootstrap/module"
 
 	configx "github.com/iamKienb/shopify-go-platform/config"
 	"golang.org/x/net/http2"
@@ -22,11 +21,9 @@ type App struct {
 	infra  *module.InfraModule
 }
 
-func NewApp() *App {
+func NewApp(logger *slog.Logger) *App {
 	return &App{
-		logger: slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
-		})),
+		logger: logger,
 	}
 }
 
@@ -77,9 +74,19 @@ func (a *App) Stop(ctx context.Context) error {
 		}
 	}
 
-	if a.infra != nil && a.infra.PostgresPool != nil {
-		a.infra.PostgresPool.Close()
+	if a.infra != nil {
+		if a.infra.PGService != nil {
+			a.logger.Info("closing postgres connection...")
+			a.infra.PGService.Close()
+		}
+
+		if a.infra.RedisService != nil {
+			a.logger.Info("closing redis connection...")
+			_ = a.infra.RedisService.Close()
+		}
 	}
+
+	a.logger.Info("app stopped cleanly")
 
 	return nil
 }

@@ -3,8 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
-
-	"shopify-user-command-module/internal/domain/auth"
+	"user-command-module/internal/domain/auth"
 )
 
 func (r *authRepository) SaveLoginStat(ctx context.Context, stat *auth.LoginStat) error {

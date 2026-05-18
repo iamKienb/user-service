@@ -1,14 +1,15 @@
 package port
 
 import (
-	"shopify-user-command-module/internal/domain/account"
 	"time"
+	"user-command-module/internal/domain/account"
 )
 
 type UserClaims struct {
 	UserID          string
 	Email           string
-	Roles           []account.UserRole
+	FullName        string
+	Roles           []account.RoleEnum
 	PasswordVersion int
 }
 

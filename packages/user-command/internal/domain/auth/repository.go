@@ -1,9 +1,12 @@
 package auth
 
-import "context"
+import (
+	"context"
+	"user-command-module/internal/domain/shared"
+)
 
 type QueryRepository interface {
-	FindLoginStatByUserID(ctx context.Context, userID string) (*LoginStat, error)
+	FindLoginStatByUserID(ctx context.Context, userID shared.UserID) (*LoginStat, error)
 }
 
 type CommandRepository interface {

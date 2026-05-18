@@ -4,20 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/shared"
+	"user-shared-module/common"
 
-	"shopify-user-command-module/internal/domain/account"
-	"shopify-user-command-module/internal/infra/common"
-
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *accountRepository) FindAggregateByID(ctx context.Context, id string) (*account.Aggregate, error) {
-	userID, err := uuid.Parse(id)
-	if err != nil {
-		return nil, account.ErrUserInvalid
-	}
-
+func (r *accountRepository) LoadAggByID(ctx context.Context, userID shared.UserID) (*account.Aggregate, error) {
 	pgUUID := common.ToPgUUID(userID)
 	q := r.getQuerier(ctx)
 
@@ -29,7 +23,7 @@ func (r *accountRepository) FindAggregateByID(ctx context.Context, id string) (*
 		return nil, fmt.Errorf("infra: get user by id: %w", err)
 	}
 
-	credentialRow, err := q.GetCredentialByID(ctx, pgUUID)
+	credentialRow, err := q.GetUserCredentialByID(ctx, pgUUID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
@@ -37,7 +31,7 @@ func (r *accountRepository) FindAggregateByID(ctx context.Context, id string) (*
 		return nil, fmt.Errorf("infra: get credential by id: %w", err)
 	}
 
-	profileRow, err := q.GetProfileByID(ctx, pgUUID)
+	profileRow, err := q.GetUserProfileByID(ctx, pgUUID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
@@ -52,12 +46,7 @@ func (r *accountRepository) FindAggregateByID(ctx context.Context, id string) (*
 	), nil
 }
 
-func (r *accountRepository) FindByUserID(ctx context.Context, id string) (*account.User, error) {
-	userID, err := uuid.Parse(id)
-	if err != nil {
-		return nil, account.ErrUserInvalid
-	}
-
+func (r *accountRepository) FindByUserID(ctx context.Context, userID shared.UserID) (*account.User, error) {
 	userRow, err := r.getQuerier(ctx).GetUserByID(ctx, common.ToPgUUID(userID))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -81,7 +70,7 @@ func (r *accountRepository) FindByEmail(ctx context.Context, email string) (*acc
 	return toDomainUser(userRow), nil
 }
 
-func (r *accountRepository) FindForAuthentication(ctx context.Context, email string) (*account.Aggregate, error) {
+func (r *accountRepository) LoadAggByEmail(ctx context.Context, email string) (*account.Aggregate, error) {
 	q := r.getQuerier(ctx)
 
 	userRow, err := q.GetUserByEmail(ctx, email)
@@ -92,7 +81,7 @@ func (r *accountRepository) FindForAuthentication(ctx context.Context, email str
 		return nil, fmt.Errorf("infra: get user for login: %w", err)
 	}
 
-	credentialRow, err := q.GetCredentialByID(ctx, userRow.ID)
+	credentialRow, err := q.GetUserCredentialByID(ctx, userRow.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

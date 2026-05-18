@@ -1,34 +1,38 @@
 package account
 
-import "time"
-
-type UserRole string
-
-const (
-	RoleCustomer   UserRole = "CUSTOMER"
-	RoleShopStaff  UserRole = "SHOP_STAFF"
-	RoleShopOwner  UserRole = "SHOP_OWNER"
-	RoleSuperAdmin UserRole = "SUPER_ADMIN"
+import (
+	"time"
+	"user-command-module/internal/domain/shared"
 )
 
-type UserStatus string
+type RoleEnum string
 
 const (
-	StatusPending UserStatus = "PENDING"
-	StatusActive  UserStatus = "ACTIVE"
-	StatusBanned  UserStatus = "BANNED"
-	StatusDeleted UserStatus = "DELETED"
+	RoleCustomer   RoleEnum = "CUSTOMER"
+	RoleShopStaff  RoleEnum = "SHOP_STAFF"
+	RoleShopOwner  RoleEnum = "SHOP_OWNER"
+	RoleSuperAdmin RoleEnum = "SUPER_ADMIN"
+)
+
+type StatusEnum string
+
+const (
+	StatusPending StatusEnum = "PENDING"
+	StatusActive  StatusEnum = "ACTIVE"
+	StatusBanned  StatusEnum = "BANNED"
+	StatusDeleted StatusEnum = "DELETED"
 )
 
 type User struct {
-	ID              UserID
+	ID              shared.UserID
 	Email           string
-	Status          UserStatus
+	Status          StatusEnum
 	EmailVerifiedAt *time.Time
-	Roles           []UserRole
+	Roles           []RoleEnum
 	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	UpdatedAt       *time.Time
 	DeletedAt       *time.Time
+	EventEntity     shared.EventEntity
 }
 
 func (u *User) IsActive() bool {
@@ -38,7 +42,8 @@ func (u *User) IsActive() bool {
 func (u *User) Activate() {
 	u.Status = StatusActive
 	now := time.Now().UTC()
-	u.UpdatedAt = now
+	u.UpdatedAt = &now
+
 	if u.EmailVerifiedAt == nil {
 		u.EmailVerifiedAt = &now
 	}

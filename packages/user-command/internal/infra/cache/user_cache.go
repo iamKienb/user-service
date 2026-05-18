@@ -4,22 +4,20 @@ import (
 	"context"
 	"fmt"
 	"time"
-
-	"shopify-user-command-module/internal/application/port"
+	"user-command-module/internal/application/port"
 
 	redisx "github.com/iamKienb/shopify-go-platform/redis"
-	"github.com/redis/go-redis/v9"
 )
 
-const emailCacheKey = "user-command:email:%s"
+const emailCacheKey = "user-command:user:email:%s"
 
 type userCache struct {
 	cache redisx.Cache
 }
 
-func NewUserCache(client *redis.Client) port.UserCache {
+func NewUserCache(service redisx.RedisXService) port.UserCache {
 	return &userCache{
-		cache: redisx.NewRedisService(client),
+		cache: service,
 	}
 }
 

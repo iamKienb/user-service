@@ -1,28 +1,27 @@
 package security
 
 import (
-	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/infra/common"
+	"user-command-module/internal/application/port"
+	"user-shared-module/common"
 
-	configx "github.com/iamKienb/shopify-go-platform/config"
-	authx "github.com/iamKienb/shopify-go-platform/middleware/auth"
+	jwtx "github.com/iamKienb/shopify-go-platform/jwt"
 )
 
 type TokenGenerator struct {
-	authx.Generator
+	service jwtx.JWTXService
 }
 
-func NewTokenGenerator(cfg configx.JwtConfig) port.TokenService {
+func NewTokenGenerator(service jwtx.JWTXService) port.TokenService {
 	return &TokenGenerator{
-		Generator: authx.NewJWTGenerator(cfg),
+		service: service,
 	}
 }
 
 func (g *TokenGenerator) GeneratePair(claims port.UserClaims) (*port.TokenPair, error) {
-	pair, err := g.Generator.GeneratePair(authx.Claims{
+	pair, err := g.service.GeneratePair(jwtx.Claims{
 		UserID:          claims.UserID,
 		Email:           claims.Email,
-		Roles:           common.ToStringRoles(claims.Roles),
+		Roles:           common.ToStringSlice(claims.Roles),
 		PasswordVersion: claims.PasswordVersion,
 	})
 	if err != nil {

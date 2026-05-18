@@ -2,11 +2,10 @@ package auth
 
 import (
 	"time"
-
-	"shopify-user-command-module/db/repository"
-	"shopify-user-command-module/internal/domain/account"
-	"shopify-user-command-module/internal/domain/auth"
-	"shopify-user-command-module/internal/infra/common"
+	"user-command-module/db/repository"
+	"user-command-module/internal/domain/auth"
+	"user-command-module/internal/domain/shared"
+	"user-shared-module/common"
 )
 
 func toDomainLoginStat(row repository.LoginStat) *auth.LoginStat {
@@ -21,7 +20,7 @@ func toDomainLoginStat(row repository.LoginStat) *auth.LoginStat {
 	}
 
 	return &auth.LoginStat{
-		UserID:       account.UserID{Value: row.UserID.Bytes},
+		UserID:       shared.UserID(row.UserID.Bytes),
 		FailedCount:  int(row.FailedCount),
 		LastFailedAt: lastFailedAt,
 		LockUntil:    lockUntil,
@@ -31,7 +30,7 @@ func toDomainLoginStat(row repository.LoginStat) *auth.LoginStat {
 
 func toInfraLoginStat(s *auth.LoginStat) repository.SaveLoginStatsParams {
 	return repository.SaveLoginStatsParams{
-		UserID:       common.ToPgUUID(s.UserID.Value),
+		UserID:       common.ToPgUUID(s.UserID),
 		FailedCount:  int32(s.FailedCount),
 		LockUntil:    common.ToPgTimeStampZ(s.LockUntil),
 		LastFailedAt: common.ToPgTimeStampZ(s.LastFailedAt),

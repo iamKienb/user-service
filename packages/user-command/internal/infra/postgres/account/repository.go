@@ -2,27 +2,36 @@ package account
 
 import (
 	"context"
+	"errors"
+	"user-command-module/db/repository"
+	"user-command-module/internal/domain/account"
 
-	"shopify-user-command-module/db/repository"
-	"shopify-user-command-module/internal/domain/account"
-
-	postgresx "github.com/iamKienb/shopify-go-platform/postgres"
-	"github.com/jackc/pgx/v5/pgxpool"
+	pgx "github.com/iamKienb/shopify-go-platform/postgres"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type accountRepository struct {
 	queries *repository.Queries
 }
 
-func NewRepository(db *pgxpool.Pool) account.Repository {
+func NewRepository(service pgx.PGXService) account.Repository {
 	return &accountRepository{
-		queries: repository.New(db),
+		queries: repository.New(service.GetPool()),
 	}
 }
 
 func (r *accountRepository) getQuerier(ctx context.Context) *repository.Queries {
-	if tx := postgresx.ExtractTx(ctx); tx != nil {
+	if tx := pgx.ExtractTx(ctx); tx != nil {
 		return r.queries.WithTx(tx)
 	}
 	return r.queries
+}
+
+func (r *accountRepository) IsDuplicateEmail(err error) bool {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		return pgErr.Code == "23505" && pgErr.ConstraintName == "uq_users_email"
+	}
+
+	return false
 }

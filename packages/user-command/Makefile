@@ -11,6 +11,15 @@ migrate-up:
 migrate-drop:
 	migrate -path db/migrations -database "$(DB_URL)" drop
 
+seed:
+	migrate create -ext sql -dir db/seeds -seq $(name)
+
+seed-up:
+	migrate -path db/seeds -database "$(DB_URL)&x-migrations-table=seed_migrations" up
+
+seed-drop:
+	migrate -path db/seeds -database "$(DB_URL)&x-migrations-table=seed_migrations" drop
+
 proto:
 	@echo "--- Generating Proto  ---"
 	buf generate

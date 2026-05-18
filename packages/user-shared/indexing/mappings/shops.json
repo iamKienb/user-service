@@ -1,0 +1,202 @@
+{
+    "settings": {
+        "number_of_shards": 2,
+        "number_of_replicas": 1,
+        "analysis": {
+            "normalizer": {
+                "standard_normalizer": {
+                    "type": "custom",
+                    "filter": [
+                        "lowercase",
+                        "asciifolding"
+                    ]
+                }
+            },
+            "analyzer": {
+                "standard_ascii": {
+                    "tokenizer": "icu_tokenizer",
+                    "filter": [
+                        "lowercase",
+                        "icu_folding",
+                        "icu_normalizer"
+                    ]
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "id": {
+                "type": "keyword"
+            },
+            "owner_id": {
+                "type": "keyword"
+            },
+            "name": {
+                "type": "text",
+                "analyzer": "standard_ascii",
+                "fields": {
+                    "raw": {
+                        "type": "keyword",
+                        "normalizer": "standard_normalizer"
+                    }
+                }
+            },
+            "slug": {
+                "type": "keyword"
+            },
+            "status": {
+                "type": "keyword",
+                "normalizer": "standard_normalizer"
+            },
+            "profile": {
+                "shop_id": {
+                    "type": "keyword"
+                },
+                "description": {
+                    "type": "text",
+                    "analyzer": "standard_ascii"
+                },
+                "logo_url": {
+                    "type": "keyword"
+                },
+                "banner_url": {
+                    "type": "keyword"
+                }
+            },
+            "address": {
+                "type": "nested",
+                "properties": {
+                    "id": {
+                        "type": "keyword",
+                        "normalizer": "standard_normalizer"
+                    },
+                    "shop_id": {
+                        "type": "keyword",
+                        "normalizer": "standard_normalizer"
+                    },
+                    "full_address": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "country": {
+                        "properties": {
+                            "country_id": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "city": {
+                        "properties": {
+                            "city_id": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "district": {
+                        "properties": {
+                            "district_id": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "ward": {
+                        "properties": {
+                            "ward_id": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    },
+                    "address_line": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "contact_name": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "phone_number": {
+                        "type": "keyword"
+                    },
+                    "type": {
+                        "type": "keyword",
+                        "normalizer": "standard_normalizer"
+                    }
+                }
+            },
+            "members": {
+                "type": "nested",
+                "properties": {
+                    "member_id": {
+                        "type": "keyword"
+                    },
+                    "member_name": {
+                        "type": "text",
+                        "analyzer": "standard_ascii"
+                    },
+                    "added_by": {
+                        "type": "keyword"
+                    },
+                    "name_added_by": {
+                        "type": "text",
+                        "analyzer": "standard_ascii"
+                    },
+                    "roles": {
+                        "type": "nested",
+                        "properties": {
+                            "id": {
+                                "type": "keyword"
+                            },
+                            "code": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            },
+                            "name": {
+                                "type": "text",
+                                "analyzer": "standard_ascii"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

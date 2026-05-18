@@ -55,7 +55,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 	return i, err
 }
 
-const insertUser = `-- name: InsertUser :exec
+const saveUser = `-- name: SaveUser :exec
 INSERT INTO users (
     id,
     email,
@@ -69,7 +69,7 @@ INSERT INTO users (
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 `
 
-type InsertUserParams struct {
+type SaveUserParams struct {
 	ID              pgtype.UUID
 	Email           string
 	EmailVerifiedAt pgtype.Timestamptz
@@ -80,8 +80,8 @@ type InsertUserParams struct {
 	DeletedAt       pgtype.Timestamptz
 }
 
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
-	_, err := q.db.Exec(ctx, insertUser,
+func (q *Queries) SaveUser(ctx context.Context, arg SaveUserParams) error {
+	_, err := q.db.Exec(ctx, saveUser,
 		arg.ID,
 		arg.Email,
 		arg.EmailVerifiedAt,

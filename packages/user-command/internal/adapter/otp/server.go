@@ -2,12 +2,12 @@ package otp
 
 import (
 	"context"
-	"shopify-user-command-module/internal/application/command/resend_otp"
-	"shopify-user-command-module/internal/application/command/verify_otp"
+	"user-command-module/internal/application/command/resend_otp"
+	"user-command-module/internal/application/command/verify_otp"
 
 	"connectrpc.com/connect"
-	otpv1 "github.com/iamKienb/shopify-go-api/gen/otp"
-	"github.com/iamKienb/shopify-go-api/gen/otp/otpconnect"
+	otpv1 "github.com/iamKienb/api-contract/gen/otp"
+	"github.com/iamKienb/api-contract/gen/otp/otpconnect"
 )
 
 type otpServer struct {

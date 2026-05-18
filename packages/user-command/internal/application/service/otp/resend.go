@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"shopify-user-command-module/internal/application/command/resend_otp"
-	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/application/shared"
-	"shopify-user-command-module/internal/domain/auth"
+	"user-command-module/internal/application/command/resend_otp"
+	"user-command-module/internal/application/port"
+	"user-command-module/internal/application/shared"
+	"user-command-module/internal/domain/auth"
 )
 
 func (s *otpService) Resend(ctx context.Context, cmd resend_otp.Command) (*resend_otp.Result, error) {

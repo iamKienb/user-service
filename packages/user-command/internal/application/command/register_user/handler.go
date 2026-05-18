@@ -5,7 +5,7 @@ import (
 )
 
 type userService interface {
-	Register(ctx context.Context, params Command) (*Result, error)
+	Register(ctx context.Context, cmd Command) (*Result, error)
 }
 
 type handler struct {

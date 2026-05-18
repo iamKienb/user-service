@@ -11,4 +11,6 @@ const (
 	SessionTTL      = 60 * time.Minute
 	ResendMaxCount  = 5
 	ResendWindowTTL = 5 * time.Minute
+
+	IdemKeyTTL = 5 * time.Second
 )

@@ -8,27 +8,24 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Address struct {
-	ID           pgtype.UUID
-	UserID       pgtype.UUID
-	Label        string
-	ReceiverName string
-	PhoneNumber  string
-	AddressLine  string
-	Ward         string
-	District     string
-	City         string
-	Country      string
-	IsDefault    bool
-	CreatedAt    pgtype.Timestamptz
-	UpdatedAt    pgtype.Timestamptz
+type City struct {
+	ID        int32
+	CountryID pgtype.Int4
+	Name      string
+	Type      pgtype.Text
 }
 
-type Credential struct {
-	UserID            pgtype.UUID
-	PasswordHash      string
-	PasswordVersion   int32
-	PasswordUpdatedAt pgtype.Timestamptz
+type Country struct {
+	ID   int32
+	Name string
+	Code pgtype.Text
+}
+
+type District struct {
+	ID     int32
+	CityID pgtype.Int4
+	Name   string
+	Type   pgtype.Text
 }
 
 type LoginStat struct {
@@ -46,43 +43,69 @@ type Outbox struct {
 	EventType      string
 	Payload        []byte
 	PartitionKey   string
-	Status         string
-	ProcessedAt    pgtype.Timestamptz
-	CreatedAt      pgtype.Timestamptz
-	UpdatedAt      pgtype.Timestamptz
 	IdempotencyKey pgtype.UUID
-	RetryCount     int32
-	NextRetryAt    pgtype.Timestamptz
-	ErrorMessage   pgtype.Text
-}
-
-type Profile struct {
-	UserID      pgtype.UUID
-	FullName    string
-	Gender      string
-	PhoneNumber pgtype.Text
-	AvatarUrl   pgtype.Text
-	DateOfBirth pgtype.Date
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
+	CreatedAt      pgtype.Timestamptz
 }
 
 type Shop struct {
+	ID        pgtype.UUID
+	OwnerID   pgtype.UUID
+	Name      string
+	Slug      string
+	Status    string
+	CreatedBy pgtype.UUID
+	UpdatedBy pgtype.UUID
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+	DeletedAt pgtype.Timestamptz
+}
+
+type ShopAddress struct {
 	ID          pgtype.UUID
-	Name        string
-	Slug        string
-	Description pgtype.Text
-	LogoUrl     pgtype.Text
-	Status      string
+	ShopID      pgtype.UUID
+	CountryID   int32
+	CityID      int32
+	DistrictID  int32
+	WardID      int32
+	AddressLine string
+	ContactName string
+	PhoneNumber string
+	Type        string
+	CreatedBy   pgtype.UUID
+	UpdatedBy   pgtype.UUID
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
-	DeletedAt   pgtype.Timestamptz
 }
 
 type ShopMember struct {
-	ShopID pgtype.UUID
-	UserID pgtype.UUID
-	RoleID int32
+	ShopID   pgtype.UUID
+	MemberID pgtype.UUID
+	JoinedAt pgtype.Timestamptz
+	AddedBy  pgtype.UUID
+}
+
+type ShopMemberRole struct {
+	ShopID    pgtype.UUID
+	MemberID  pgtype.UUID
+	RoleID    int32
+	UpdatedBy pgtype.UUID
+}
+
+type ShopProfile struct {
+	ShopID      pgtype.UUID
+	Description pgtype.Text
+	LogoUrl     pgtype.Text
+	BannerUrl   pgtype.Text
+	CreatedBy   pgtype.UUID
+	UpdatedBy   pgtype.UUID
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
+
+type ShopRole struct {
+	ID   int32
+	Code string
+	Name string
 }
 
 type User struct {
@@ -94,4 +117,45 @@ type User struct {
 	CreatedAt       pgtype.Timestamptz
 	UpdatedAt       pgtype.Timestamptz
 	DeletedAt       pgtype.Timestamptz
+}
+
+type UserAddress struct {
+	ID           pgtype.UUID
+	UserID       pgtype.UUID
+	CountryID    int32
+	CityID       int32
+	DistrictID   int32
+	WardID       int32
+	AddressLine  string
+	ReceiverName string
+	PhoneNumber  string
+	Label        string
+	IsDefault    bool
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
+}
+
+type UserCredential struct {
+	UserID            pgtype.UUID
+	PasswordHash      string
+	PasswordVersion   int32
+	PasswordUpdatedAt pgtype.Timestamptz
+}
+
+type UserProfile struct {
+	UserID      pgtype.UUID
+	FullName    string
+	Gender      string
+	PhoneNumber pgtype.Text
+	AvatarUrl   pgtype.Text
+	DateOfBirth pgtype.Date
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
+
+type Ward struct {
+	ID         int32
+	DistrictID pgtype.Int4
+	Name       string
+	Type       pgtype.Text
 }

@@ -6,8 +6,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"shopify-user-command-module/internal/application/port"
 	"strings"
+	"user-command-module/internal/application/port"
 
 	configx "github.com/iamKienb/shopify-go-platform/config"
 	"golang.org/x/crypto/argon2"

@@ -1,9 +1,9 @@
 package otp
 
 import (
-	"shopify-user-command-module/internal/application/service/otp/i18n"
-	"shopify-user-command-module/internal/domain/account"
-	"shopify-user-command-module/internal/domain/auth"
+	"user-command-module/internal/application/service/otp/i18n"
+	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/auth"
 
 	"github.com/iamKienb/shopify-go-platform/app_error"
 )

@@ -1,42 +1,34 @@
 package account
 
 import (
-	"strings"
 	"time"
+	"user-command-module/internal/domain/shared"
 )
 
-type Gender string
+type GenderEnum string
 
 const (
-	MALE   Gender = "MALE"
-	FEMALE Gender = "FEMALE"
-	OTHER  Gender = "OTHER"
+	GenderMale   GenderEnum = "MALE"
+	GenderFemale GenderEnum = "FEMALE"
+	GenderOther  GenderEnum = "OTHER"
 )
 
-type Profile struct {
-	UserID      UserID
+type UserProfile struct {
+	UserID      shared.UserID
 	FullName    string
-	Gender      Gender
+	Gender      GenderEnum
 	PhoneNumber *string
 	AvatarURL   *string
 	DateOfBirth *time.Time
 	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	UpdatedAt   *time.Time
 }
 
-func (g Gender) IsValid() bool {
-	switch g {
-	case MALE, FEMALE, OTHER:
+func (e GenderEnum) IsValid() bool {
+	switch e {
+	case GenderMale, GenderFemale, GenderOther:
 		return true
 	}
+
 	return false
-}
-
-func ValidateGender(gender string) (Gender, error) {
-	normalized := Gender(strings.ToUpper(strings.TrimSpace(gender)))
-	if !normalized.IsValid() {
-		return "", ErrGenderInvalid
-	}
-
-	return normalized, nil
 }

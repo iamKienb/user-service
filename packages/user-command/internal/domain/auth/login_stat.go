@@ -3,7 +3,7 @@ package auth
 import (
 	"time"
 
-	"shopify-user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/shared"
 )
 
 const (
@@ -13,14 +13,14 @@ const (
 )
 
 type LoginStat struct {
-	UserID       account.UserID
+	UserID       shared.UserID
 	FailedCount  int
 	LastFailedAt *time.Time
 	LockUntil    *time.Time
 	UpdatedAt    time.Time
 }
 
-func NewLoginStat(userID account.UserID) *LoginStat {
+func NewLoginStat(userID shared.UserID) *LoginStat {
 	now := time.Now().UTC()
 
 	return &LoginStat{

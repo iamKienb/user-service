@@ -4,50 +4,72 @@ import (
 	"context"
 	"fmt"
 
-	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/bootstrap/config"
-	"shopify-user-command-module/internal/domain/account"
-	"shopify-user-command-module/internal/domain/auth"
-	"shopify-user-command-module/internal/infra/cache"
-	accountpg "shopify-user-command-module/internal/infra/postgres/account"
-	authpg "shopify-user-command-module/internal/infra/postgres/auth"
-	"shopify-user-command-module/internal/infra/security"
+	"user-command-module/internal/application/port"
+	"user-command-module/internal/bootstrap/config"
+	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/auth"
+	"user-command-module/internal/domain/shop"
+	"user-command-module/internal/infra/cache"
+	accountPg "user-command-module/internal/infra/postgres/account"
+	authPg "user-command-module/internal/infra/postgres/auth"
+	outboxPg "user-command-module/internal/infra/postgres/outbox"
+	shopPg "user-command-module/internal/infra/postgres/shop"
+	"user-command-module/internal/infra/security"
 
-	postgresx "github.com/iamKienb/shopify-go-platform/postgres"
+	jwtx "github.com/iamKienb/shopify-go-platform/jwt"
+	pgx "github.com/iamKienb/shopify-go-platform/postgres"
 	redisx "github.com/iamKienb/shopify-go-platform/redis"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type InfraModule struct {
-	PostgresPool   *pgxpool.Pool
-	AccountRepo    account.Repository
-	AuthRepo       auth.Repository
-	UserCache      port.UserCache
-	OtpCache       port.OTPCache
+	PGService    pgx.PGXService
+	RedisService redisx.RedisXService
+
+	AccountRepo account.Repository
+	AuthRepo    auth.Repository
+	OutboxRepo  port.OutboxRepository
+	ShopRepo    shop.Repository
+
+	UserCache port.UserCache
+	OtpCache  port.OTPCache
+	ShopCache port.ShopCache
+
 	TxManager      port.TxManager
 	Hasher         port.PasswordHasher
 	TokenGenerator port.TokenService
 }
 
 func NewInfraModule(ctx context.Context, cfg *config.UserCommandConfig) (*InfraModule, error) {
-	pgClient, err := postgresx.New(cfg.Postgres)
+	pgService, err := pgx.New(cfg.Postgres)
 	if err != nil {
 		return nil, fmt.Errorf("postgres: %w", err)
 	}
 
-	redisClient, err := redisx.New(cfg.Redis)
+	redisService, err := redisx.New(cfg.Redis)
 	if err != nil {
 		return nil, fmt.Errorf("redis: %w", err)
 	}
 
+	jwtService, err := jwtx.New(cfg.Jwt)
+	if err != nil {
+		return nil, fmt.Errorf("jwt: %w", err)
+	}
+
 	return &InfraModule{
-		PostgresPool:   pgClient.Pool,
-		AccountRepo:    accountpg.NewRepository(pgClient.Pool),
-		AuthRepo:       authpg.NewRepository(pgClient.Pool),
-		UserCache:      cache.NewUserCache(redisClient.Conn),
-		OtpCache:       cache.NewOTPCache(redisClient.Conn),
-		TxManager:      postgresx.NewTxManager(pgClient.Pool),
+		PGService:    pgService,
+		RedisService: redisService,
+
+		AccountRepo: accountPg.NewRepository(pgService),
+		AuthRepo:    authPg.NewRepository(pgService),
+		OutboxRepo:  outboxPg.NewRepository(pgService),
+		ShopRepo:    shopPg.NewRepository(pgService),
+
+		UserCache: cache.NewUserCache(redisService),
+		OtpCache:  cache.NewOTPCache(redisService),
+		ShopCache: cache.NewShopCache(redisService),
+
+		TxManager:      pgx.NewTxManager(pgService.GetPool()),
 		Hasher:         security.NewArgon2Hasher(cfg.Argon2),
-		TokenGenerator: security.NewTokenGenerator(cfg.Jwt),
+		TokenGenerator: security.NewTokenGenerator(jwtService),
 	}, nil
 }

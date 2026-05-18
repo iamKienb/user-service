@@ -4,22 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"user-command-module/internal/domain/auth"
+	"user-command-module/internal/domain/shared"
+	"user-shared-module/common"
 
-	"shopify-user-command-module/internal/domain/account"
-	"shopify-user-command-module/internal/domain/auth"
-	"shopify-user-command-module/internal/infra/common"
-
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *authRepository) FindLoginStatByUserID(ctx context.Context, userID string) (*auth.LoginStat, error) {
-	parsedID, err := uuid.Parse(userID)
-	if err != nil {
-		return nil, account.ErrUserInvalid
-	}
-
-	statsRow, err := r.getQuerier(ctx).GetLoginStatsByID(ctx, common.ToPgUUID(parsedID))
+func (r *authRepository) FindLoginStatByUserID(ctx context.Context, userID shared.UserID) (*auth.LoginStat, error) {
+	statsRow, err := r.getQuerier(ctx).GetLoginStatsByID(ctx, common.ToPgUUID(userID))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

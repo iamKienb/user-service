@@ -1,4 +1,4 @@
--- name: InsertUser :exec
+-- name: SaveUser :exec
 INSERT INTO users (
     id,
     email,

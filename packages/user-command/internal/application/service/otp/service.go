@@ -2,10 +2,11 @@ package otp
 
 import (
 	"context"
-	"shopify-user-command-module/internal/application/command/resend_otp"
-	"shopify-user-command-module/internal/application/command/verify_otp"
-	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/domain/account"
+	"user-command-module/internal/application/command/resend_otp"
+	"user-command-module/internal/application/command/verify_otp"
+	"user-command-module/internal/application/port"
+	"user-command-module/internal/application/service/outbox"
+	"user-command-module/internal/domain/account"
 )
 
 type Service interface {
@@ -14,17 +15,28 @@ type Service interface {
 }
 
 type otpService struct {
-	accountRepo account.Repository
-	tokenGen    port.TokenService
-	otpCache    port.OTPCache
-	txManager   port.TxManager
+	accountRepo   account.Repository
+	outboxService outbox.Service
+
+	tokenGen  port.TokenService
+	otpCache  port.OTPCache
+	txManager port.TxManager
 }
 
-func NewOTPService(accountRepo account.Repository, tokenGen port.TokenService, otpCache port.OTPCache, txManager port.TxManager) Service {
+func NewOTPService(
+	accountRepo account.Repository,
+	outboxService outbox.Service,
+
+	tokenGen port.TokenService,
+	otpCache port.OTPCache,
+	txManager port.TxManager,
+) Service {
 	return &otpService{
-		accountRepo: accountRepo,
-		tokenGen:    tokenGen,
-		otpCache:    otpCache,
-		txManager:   txManager,
+		accountRepo:   accountRepo,
+		outboxService: outboxService,
+
+		tokenGen:  tokenGen,
+		otpCache:  otpCache,
+		txManager: txManager,
 	}
 }

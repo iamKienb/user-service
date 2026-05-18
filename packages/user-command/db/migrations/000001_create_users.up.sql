@@ -5,8 +5,8 @@ CREATE TABLE users (
     status TEXT NOT NULL DEFAULT 'PENDING',
     roles TEXT[] NOT NULL DEFAULT '{CUSTOMER}',
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ DEFAULT NULL,
+    deleted_at TIMESTAMPTZ DEFAULT NULL,
     CONSTRAINT user_status_check
         CHECK (status IN ('PENDING', 'ACTIVE', 'BANNED', 'DELETED')),
     CONSTRAINT user_roles_check

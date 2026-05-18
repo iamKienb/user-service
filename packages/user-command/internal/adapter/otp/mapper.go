@@ -1,10 +1,10 @@
 package otp
 
 import (
-	"shopify-user-command-module/internal/application/command/resend_otp"
-	"shopify-user-command-module/internal/application/command/verify_otp"
+	"user-command-module/internal/application/command/resend_otp"
+	"user-command-module/internal/application/command/verify_otp"
 
-	"github.com/iamKienb/shopify-go-api/gen/otp"
+	"github.com/iamKienb/api-contract/gen/otp"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

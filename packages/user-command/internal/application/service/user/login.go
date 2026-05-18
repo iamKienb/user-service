@@ -3,14 +3,14 @@ package user
 import (
 	"context"
 
-	"shopify-user-command-module/internal/application/command/login_user"
-	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/domain/account"
-	"shopify-user-command-module/internal/domain/auth"
+	"user-command-module/internal/application/command/login_user"
+	"user-command-module/internal/application/port"
+	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/auth"
 )
 
 func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login_user.Result, error) {
-	agg, err := s.accountRepo.FindForAuthentication(ctx, cmd.Email)
+	agg, err := s.accountRepo.LoadAggByEmail(ctx, cmd.Email)
 	if err != nil {
 		return nil, s.wrapError(err)
 	}
@@ -25,6 +25,7 @@ func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login
 	tokenPair, err := s.tokenGen.GeneratePair(port.UserClaims{
 		UserID:          agg.User.ID.String(),
 		Email:           agg.User.Email,
+		FullName:        agg.Profile.FullName,
 		Roles:           agg.User.Roles,
 		PasswordVersion: agg.Credential.PasswordVersion,
 	})
@@ -45,7 +46,7 @@ func (s *userService) verifyLoginPolicy(ctx context.Context, agg *account.Aggreg
 		return err
 	}
 
-	stats, err := s.authRepo.FindLoginStatByUserID(ctx, agg.User.ID.String())
+	stats, err := s.authRepo.FindLoginStatByUserID(ctx, agg.User.ID)
 	if err != nil {
 		return err
 	}
@@ -64,7 +65,7 @@ func (s *userService) verifyLoginPolicy(ctx context.Context, agg *account.Aggreg
 		return auth.ErrInvalidCredentials
 	}
 
-	if err := agg.EnsureCanLogin(); err != nil {
+	if err := agg.CheckActiveIfLogin(); err != nil {
 		return err
 	}
 

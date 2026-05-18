@@ -4,11 +4,13 @@ import (
 	"context"
 	"time"
 
-	"shopify-user-command-module/internal/application/command/verify_otp"
-	"shopify-user-command-module/internal/application/port"
-	"shopify-user-command-module/internal/application/shared"
-	"shopify-user-command-module/internal/domain/account"
-	"shopify-user-command-module/internal/domain/auth"
+	"user-command-module/internal/application/command/verify_otp"
+	"user-command-module/internal/application/port"
+	"user-command-module/internal/application/shared"
+	domain_shared "user-command-module/internal/domain/shared"
+
+	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/auth"
 )
 
 func (s *otpService) Verify(ctx context.Context, cmd verify_otp.Command) (*verify_otp.Result, error) {
@@ -29,6 +31,7 @@ func (s *otpService) Verify(ctx context.Context, cmd verify_otp.Command) (*verif
 	tokenPair, err := s.tokenGen.GeneratePair(port.UserClaims{
 		UserID:          agg.User.ID.String(),
 		Email:           agg.User.Email,
+		FullName:        agg.Profile.FullName,
 		Roles:           agg.User.Roles,
 		PasswordVersion: agg.Credential.PasswordVersion,
 	})
@@ -75,17 +78,36 @@ func (s *otpService) validateOTP(ctx context.Context, token, inputOTP string) (*
 }
 
 func (s *otpService) activateUserIfNeeded(ctx context.Context, userID string) (*account.Aggregate, error) {
-	agg, err := s.accountRepo.FindAggregateByID(ctx, userID)
+	parseUserID, err := domain_shared.ParseToRawID[domain_shared.UserID](userID)
+	if err != nil {
+		return nil, account.ErrUserInvalid
+	}
+	agg, err := s.accountRepo.LoadAggByID(ctx, parseUserID)
 	if err != nil || agg == nil {
 		return nil, account.ErrUserNotFound
 	}
 
-	if agg.ActivateIfNeeded() {
-		err := s.txManager.WithTx(ctx, func(txCtx context.Context) error {
-			return s.accountRepo.UpdateUser(txCtx, &agg.User)
+	if agg.ActivateIfVerified() {
+		err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
+			if err := s.accountRepo.UpdateUser(ctx, &agg.User); err != nil {
+				return err
+			}
+
+			events := agg.FlushEvents()
+			if len(events) == 0 {
+				return nil
+			}
+
+			publishParams := port.OutboxParam{
+				AggregateID:   agg.User.ID.RawID(),
+				AggregateType: account.AggregateTypeUser,
+				Events:        events,
+			}
+
+			return s.outboxService.Publish(ctx, publishParams)
 		})
 		if err != nil {
-			return nil, err
+			return nil, s.wrapError(err)
 		}
 	}
 

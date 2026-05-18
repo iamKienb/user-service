@@ -1,1 +1,1 @@
-# shopify-user-service
+# user-service

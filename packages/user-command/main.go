@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"shopify-user-command-module/internal/bootstrap"
 	"syscall"
 	"time"
+	"user-command-module/internal/bootstrap"
 )
 
 func main() {
@@ -15,6 +15,7 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
+	slog.SetDefault(logger)
 
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
@@ -23,7 +24,7 @@ func main() {
 	)
 	defer stop()
 
-	app := bootstrap.NewApp()
+	app := bootstrap.NewApp(logger)
 
 	errCh := make(chan error, 1)
 	go func() { errCh <- app.Start(ctx) }()

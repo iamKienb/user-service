@@ -5,11 +5,14 @@ import (
 	"time"
 )
 
+type UserProfile struct {
+	FullName string
+	Gender   string
+}
 type Command struct {
 	Email    string
 	Password string
-	FullName string
-	Gender   string
+	Profile  UserProfile
 }
 
 type Result struct {
