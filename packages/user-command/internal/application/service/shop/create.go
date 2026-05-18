@@ -2,7 +2,6 @@ package shop
 
 import (
 	"context"
-	"fmt"
 
 	"user-command-module/internal/application/command/create_shop"
 	"user-command-module/internal/application/port"
@@ -17,25 +16,28 @@ func (s *shopService) CreateShop(ctx context.Context, cmd create_shop.Command) (
 		return nil, s.wrapError(err)
 	}
 
-	if err := s.CheckIdempotency(ctx, cmd.User.ID); err != nil {
+	if err := s.checkIdempotency(ctx, cmd.User.ID); err != nil {
 		return nil, s.wrapError(err)
 	}
+
+	profile := profileFromCommand(cmd.Profile)
 
 	shopAgg := shop.NewAggregate(shop.AggregateParams{
 		UserID:      cmd.User.ID,
 		Name:        cmd.Name,
 		Slug:        cmd.Slug,
-		Description: cmd.Profile.Description,
-		LogoUrl:     cmd.Profile.LogoUrl,
-		BannerUrl:   cmd.Profile.BannerUrl,
+		Description: profile.Description,
+		LogoUrl:     profile.LogoUrl,
+		BannerUrl:   profile.BannerUrl,
 	})
 
 	memberAgg := shop.NewMemberAggregate(shop.MemberAggregateParams{
-		ShopID:     shopAgg.Shop.ID,
-		MemberID:   cmd.User.ID,
-		MemberName: cmd.User.Name,
-		AddedBy:    cmd.User.ID,
-		RoleIDs:    []domain_shared.RoleID{shop.RoleOwnerID},
+		ShopID:      shopAgg.Shop.ID,
+		MemberID:    cmd.User.ID,
+		MemberName:  cmd.User.Name,
+		AddedBy:     cmd.User.ID,
+		NameAddedBy: cmd.User.Name,
+		RoleIDs:     []domain_shared.RoleID{shop.RoleOwnerID},
 	})
 
 	if err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
@@ -83,13 +85,8 @@ func (s *shopService) CreateShop(ctx context.Context, cmd create_shop.Command) (
 
 	bgCtx := context.WithoutCancel(ctx)
 	go func() {
-		if err := s.shopCache.SetIdemKey(bgCtx, cmd.User.ID, shared.IdemKeyTTL); err != nil {
-			fmt.Printf("failed to set idem key", err)
-		}
-
-		if err := s.shopCache.AddSlugToBloomFilter(bgCtx, cmd.Slug); err != nil {
-			fmt.Printf("failed to update bloom filter for slug", cmd.Slug, "error", err)
-		}
+		_ = s.shopCache.SetIdemKey(bgCtx, cmd.User.ID, shared.IdemKeyTTL)
+		_ = s.shopCache.AddSlugToBloomFilter(bgCtx, cmd.Slug)
 	}()
 
 	return &create_shop.Result{
@@ -97,7 +94,7 @@ func (s *shopService) CreateShop(ctx context.Context, cmd create_shop.Command) (
 	}, nil
 }
 
-func (s *shopService) CheckIdempotency(ctx context.Context, userID domain_shared.UserID) error {
+func (s *shopService) checkIdempotency(ctx context.Context, userID domain_shared.UserID) error {
 	exists, err := s.shopCache.IsIdemKeyTaken(ctx, userID)
 	if err != nil {
 		return err
@@ -129,4 +126,12 @@ func (s *shopService) checkSlugAvailable(ctx context.Context, slug string) error
 	}
 
 	return nil
+}
+
+func profileFromCommand(profile *create_shop.Profile) create_shop.Profile {
+	if profile == nil {
+		return create_shop.Profile{}
+	}
+
+	return *profile
 }

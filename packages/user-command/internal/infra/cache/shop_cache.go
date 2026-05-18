@@ -7,7 +7,7 @@ import (
 	"user-command-module/internal/application/port"
 	"user-command-module/internal/domain/shared"
 
-	redisx "github.com/iamKienb/shopify-go-platform/redis"
+	redisx "github.com/iamKienb/go-core/redis"
 	"github.com/redis/go-redis/v9"
 )
 

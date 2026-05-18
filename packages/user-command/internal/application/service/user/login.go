@@ -25,7 +25,7 @@ func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login
 	tokenPair, err := s.tokenGen.GeneratePair(port.UserClaims{
 		UserID:          agg.User.ID.String(),
 		Email:           agg.User.Email,
-		FullName:        agg.Profile.FullName,
+		FullName:        fullNameOf(agg),
 		Roles:           agg.User.Roles,
 		PasswordVersion: agg.Credential.PasswordVersion,
 	})
@@ -65,11 +65,19 @@ func (s *userService) verifyLoginPolicy(ctx context.Context, agg *account.Aggreg
 		return auth.ErrInvalidCredentials
 	}
 
-	if err := agg.CheckActiveIfLogin(); err != nil {
+	if err := agg.EnsureActiveForLogin(); err != nil {
 		return err
 	}
 
 	stats.RecordSuccess()
 
 	return s.authRepo.SaveLoginStat(ctx, stats)
+}
+
+func fullNameOf(agg *account.Aggregate) string {
+	if agg == nil || agg.Profile == nil {
+		return ""
+	}
+
+	return agg.Profile.FullName
 }

@@ -2,15 +2,15 @@ package verify_permission
 
 import "context"
 
-type shopService interface {
+type service interface {
 	VerifyPermission(ctx context.Context, cmd Command) (*Result, error)
 }
 
 type handler struct {
-	service shopService
+	service service
 }
 
-func NewHandler(service shopService) Executor {
+func NewHandler(service service) Executor {
 	return &handler{service: service}
 }
 

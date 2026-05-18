@@ -14,13 +14,14 @@ const (
 )
 
 var RoleMetadata = map[shared.RoleID]struct {
-	Code, Name string
+	Code string
+	Name string
 }{
-	RoleOwnerID:     {Code: "OWNER", Name: "Chủ cửa hàng"},
-	RoleManagerID:   {Code: "MANAGER", Name: "Quản lý"},
-	RoleCashierID:   {Code: "CASHIER", Name: "Nhân viên thu ngân"},
-	RoleWarehouseID: {Code: "WAREHOUSE", Name: "Nhân viên kho"},
-	RoleMarketingID: {Code: "MARKETING", Name: "Nhân viên Marketing"},
+	RoleOwnerID:     {Code: "OWNER", Name: "Store Owner"},
+	RoleManagerID:   {Code: "MANAGER", Name: "Store Manager"},
+	RoleCashierID:   {Code: "CASHIER", Name: "Cashier"},
+	RoleWarehouseID: {Code: "WAREHOUSE", Name: "Warehouse Staff"},
+	RoleMarketingID: {Code: "MARKETING", Name: "Marketing Staff"},
 }
 
 type MemberAggregate struct {

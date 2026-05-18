@@ -9,6 +9,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/iamKienb/api-contract/gen/user"
 	"github.com/iamKienb/api-contract/gen/user/userconnect"
+	authx "github.com/iamKienb/go-core/middleware/auth"
 )
 
 type userServer struct {
@@ -48,7 +49,8 @@ func (s *userServer) LoginUser(ctx context.Context, req *connect.Request[user.Lo
 }
 
 func (s *userServer) AddUserAddress(ctx context.Context, req *connect.Request[user.AddUserAddressRequest]) (*connect.Response[user.AddUserAddressResponse], error) {
-	cmd, err := ToAddAddressCommand(req.Msg)
+	currentUser := authx.GetUserInfoFromCtx(ctx)
+	cmd, err := ToAddAddressCommand(currentUser.UserID, req.Msg)
 	if err != nil {
 		return nil, err
 	}

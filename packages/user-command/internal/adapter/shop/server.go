@@ -10,7 +10,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/iamKienb/api-contract/gen/shop"
 	"github.com/iamKienb/api-contract/gen/shop/shopconnect"
-	authx "github.com/iamKienb/shopify-go-platform/middleware/auth"
+	authx "github.com/iamKienb/go-core/middleware/auth"
 )
 
 type shopServer struct {
@@ -51,7 +51,8 @@ func (s *shopServer) CreateShop(ctx context.Context, req *connect.Request[shop.C
 }
 
 func (s *shopServer) AddShopAddress(ctx context.Context, req *connect.Request[shop.AddShopAddressRequest]) (*connect.Response[shop.AddShopAddressResponse], error) {
-	cmd, err := ToAddAddressCommand(req.Msg)
+	currentUser := authx.GetUserInfoFromCtx(ctx)
+	cmd, err := ToAddAddressCommand(currentUser.UserID, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +81,8 @@ func (s *shopServer) AssignMemberRoles(ctx context.Context, req *connect.Request
 }
 
 func (s *shopServer) VerifyPermission(ctx context.Context, req *connect.Request[shop.VerifyPermissionRequest]) (*connect.Response[shop.VerifyPermissionResponse], error) {
-	cmd, err := ToVerifyPermissionCommand(req.Msg)
+	currentUser := authx.GetUserInfoFromCtx(ctx)
+	cmd, err := ToVerifyPermissionCommand(currentUser.UserID, req.Msg)
 	if err != nil {
 		return nil, err
 	}

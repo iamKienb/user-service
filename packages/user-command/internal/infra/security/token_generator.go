@@ -4,7 +4,7 @@ import (
 	"user-command-module/internal/application/port"
 	"user-shared-module/common"
 
-	jwtx "github.com/iamKienb/shopify-go-platform/jwt"
+	jwtx "github.com/iamKienb/go-core/jwt"
 )
 
 type TokenGenerator struct {

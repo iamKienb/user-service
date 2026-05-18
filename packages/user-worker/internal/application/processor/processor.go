@@ -3,7 +3,6 @@ package processor
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"user-shared-module/events"
 	"user-shared-module/indexing"
 	"user-worker-module/internal/application/port"
@@ -28,7 +27,6 @@ func NewUserEventProcessor(repo port.ESRepository) port.EventProcessor {
 }
 
 func (p *UserEventProcessor) Handle(ctx context.Context, msg port.Message) error {
-	fmt.Println("msg.Topic", msg.Topic)
 	h, ok := p.handlers[msg.Topic]
 	if !ok {
 		return nil

@@ -2,15 +2,15 @@ package resend_otp
 
 import "context"
 
-type otpService interface {
+type service interface {
 	Resend(ctx context.Context, cmd Command) (*Result, error)
 }
 
 type handler struct {
-	service otpService
+	service service
 }
 
-func NewHandler(service otpService) Executor {
+func NewHandler(service service) Executor {
 	return &handler{
 		service: service,
 	}

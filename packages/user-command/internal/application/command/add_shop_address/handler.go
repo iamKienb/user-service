@@ -2,20 +2,20 @@ package add_shop_address
 
 import "context"
 
-type UserService interface {
+type service interface {
 	AddAddress(ctx context.Context, cmd Command) (*Result, error)
 }
 
-type Handler struct {
-	service UserService
+type handler struct {
+	service service
 }
 
-func NewHandler(service UserService) Executor {
-	return &Handler{
+func NewHandler(service service) Executor {
+	return &handler{
 		service: service,
 	}
 }
 
-func (h *Handler) Execute(ctx context.Context, cmd Command) (*Result, error) {
+func (h *handler) Execute(ctx context.Context, cmd Command) (*Result, error) {
 	return h.service.AddAddress(ctx, cmd)
 }

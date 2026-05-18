@@ -89,9 +89,19 @@ func (r *accountRepository) LoadAggByEmail(ctx context.Context, email string) (*
 		return nil, fmt.Errorf("infra: get credential for login: %w", err)
 	}
 
+	profileRow, err := q.GetUserProfileByID(ctx, userRow.ID)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, fmt.Errorf("infra: get profile for login: %w", err)
+	}
+
+	var profile *account.UserProfile
+	if err == nil {
+		profile = toDomainProfile(profileRow)
+	}
+
 	return account.LoadAggregate(
 		*toDomainUser(userRow),
 		toDomainCredential(credentialRow),
-		nil,
+		profile,
 	), nil
 }

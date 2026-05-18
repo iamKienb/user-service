@@ -54,7 +54,7 @@ func NewAggregate(p AggregateParams) *Aggregate {
 		ShopID:      aggregate.Shop.ID,
 		OwnerID:     p.UserID,
 		Slug:        p.Slug,
-		Status:      aggregate.Shop.Slug,
+		Status:      aggregate.Shop.Status,
 		Description: p.Description,
 		LogoUrl:     p.LogoUrl,
 		BannerUrl:   p.BannerUrl,

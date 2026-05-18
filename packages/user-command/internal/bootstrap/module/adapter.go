@@ -13,8 +13,8 @@ import (
 	"github.com/iamKienb/api-contract/gen/otp/otpconnect"
 	"github.com/iamKienb/api-contract/gen/shop/shopconnect"
 	"github.com/iamKienb/api-contract/gen/user/userconnect"
-	authx "github.com/iamKienb/shopify-go-platform/middleware/auth"
-	observabilityx "github.com/iamKienb/shopify-go-platform/middleware/observability"
+	authx "github.com/iamKienb/go-core/middleware/auth"
+	observabilityx "github.com/iamKienb/go-core/middleware/observability"
 )
 
 type AdapterModule struct {

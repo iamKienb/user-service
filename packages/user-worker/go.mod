@@ -4,7 +4,7 @@ go 1.25.8
 
 require (
 	github.com/elastic/go-elasticsearch/v8 v8.19.5
-	github.com/iamKienb/shopify-go-platform v0.4.4
+	github.com/iamKienb/go-core v0.4.6
 )
 
 require (

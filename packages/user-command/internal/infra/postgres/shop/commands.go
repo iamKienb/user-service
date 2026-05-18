@@ -52,6 +52,10 @@ func (r *shopRepository) ClearShopMemberRolesBatch(ctx context.Context, members 
 	return nil
 }
 
-func (r *shopRepository) SaveAddress(ctx, addr *shop.ShopAddress) error {
+func (r *shopRepository) SaveAddress(ctx context.Context, addr *shop.ShopAddress) error {
+	if err := r.getQuerier(ctx).SaveShopAddress(ctx, toInfraShopAddress(addr)); err != nil {
+		return fmt.Errorf("infra: save shop address failed: %w", err)
+	}
+
 	return nil
 }

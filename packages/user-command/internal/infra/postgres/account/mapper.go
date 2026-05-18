@@ -120,9 +120,9 @@ func toUpdateUserInfra(u *account.User) repository.UpdateUserParams {
 func toInfraUserAddress(p *account.UserAddress) repository.SaveUserAddressParams {
 	return repository.SaveUserAddressParams{
 		ID:     common.ToPgUUID(p.ID),
-		UserID: common.ToPgUUID(p.ID),
+		UserID: common.ToPgUUID(p.UserID),
 
-		CountryID:  int32(p.CityID),
+		CountryID:  int32(p.CountryID),
 		CityID:     int32(p.CityID),
 		DistrictID: int32(p.DistrictID),
 		WardID:     int32(p.WardID),
@@ -141,9 +141,9 @@ func toInfraUserAddress(p *account.UserAddress) repository.SaveUserAddressParams
 func toDomainAddress(row repository.UserAddress) *account.UserAddress {
 	return &account.UserAddress{
 		ID:     shared.UserAddressID(row.ID.Bytes),
-		UserID: shared.UserID(row.ID.Bytes),
+		UserID: shared.UserID(row.UserID.Bytes),
 
-		CountryID:  int(row.CityID),
+		CountryID:  int(row.CountryID),
 		CityID:     int(row.CityID),
 		DistrictID: int(row.DistrictID),
 		WardID:     int(row.WardID),

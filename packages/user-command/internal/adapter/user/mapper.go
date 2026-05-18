@@ -12,12 +12,14 @@ import (
 )
 
 func ToRegisterCommand(req *user.RegisterUserRequest) register_user.Command {
+	profile := req.GetProfile()
+
 	return register_user.Command{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
 		Profile: register_user.UserProfile{
-			FullName: req.Profile.GetFullName(),
-			Gender:   req.Profile.GetGender(),
+			FullName: profile.GetFullName(),
+			Gender:   profile.GetGender(),
 		},
 	}
 }
@@ -45,31 +47,19 @@ func ToLoginResponse(result *login_user.Result) *user.LoginUserResponse {
 	}
 }
 
-func ToAddAddressCommand(req *user.AddUserAddressRequest) (add_user_address.Command, error) {
-	userID, err := shared.ParseToRawID[shared.UserID](req.GetUserId())
+func ToAddAddressCommand(userID string, req *user.AddUserAddressRequest) (add_user_address.Command, error) {
+	parsedUserID, err := shared.ParseToRawID[shared.UserID](userID)
 	if err != nil {
 		return add_user_address.Command{}, account.ErrUserInvalid
 
 	}
 	return add_user_address.Command{
-		UserID: userID,
+		UserID: parsedUserID,
 
-		Country: add_user_address.LocationInfo{
-			ID:   int(req.Country.GetId()),
-			Name: req.Country.GetName(),
-		},
-		City: add_user_address.LocationInfo{
-			ID:   int(req.City.GetId()),
-			Name: req.City.GetName(),
-		},
-		District: add_user_address.LocationInfo{
-			ID:   int(req.District.GetId()),
-			Name: req.District.GetName(),
-		},
-		Ward: add_user_address.LocationInfo{
-			ID:   int(req.Ward.GetId()),
-			Name: req.Ward.GetName(),
-		},
+		Country:  toUserLocationInfo(req.GetCountry()),
+		City:     toUserLocationInfo(req.GetCity()),
+		District: toUserLocationInfo(req.GetDistrict()),
+		Ward:     toUserLocationInfo(req.GetWard()),
 
 		AddressLine:  req.GetAddressLine(),
 		ReceiverName: req.GetReceiverName(),
@@ -82,5 +72,21 @@ func ToAddAddressCommand(req *user.AddUserAddressRequest) (add_user_address.Comm
 func ToAddAddressResponse(result *add_user_address.Result) *user.AddUserAddressResponse {
 	return &user.AddUserAddressResponse{
 		AddressId: result.UserAddressID,
+	}
+}
+
+type userLocationSource interface {
+	GetId() int64
+	GetName() string
+}
+
+func toUserLocationInfo(src userLocationSource) add_user_address.LocationInfo {
+	if src == nil {
+		return add_user_address.LocationInfo{}
+	}
+
+	return add_user_address.LocationInfo{
+		ID:   int(src.GetId()),
+		Name: src.GetName(),
 	}
 }

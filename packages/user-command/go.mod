@@ -7,7 +7,7 @@ require (
 	connectrpc.com/grpcreflect v1.3.0
 	github.com/google/uuid v1.6.0
 	github.com/iamKienb/api-contract v0.1.5
-	github.com/iamKienb/shopify-go-platform v0.4.5
+	github.com/iamKienb/go-core v0.4.6
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/redis/go-redis/v9 v9.17.3
 	golang.org/x/crypto v0.49.0

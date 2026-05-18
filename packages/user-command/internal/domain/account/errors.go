@@ -16,5 +16,5 @@ var (
 
 	ErrCredentialNotFound = errors.New("credential_not_found")
 
-	ErrMaxAddressReached = errors.New("only had create 5 address")
+	ErrAddressLabelInvalid = errors.New("address_label_invalid")
 )

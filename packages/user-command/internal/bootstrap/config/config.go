@@ -1,7 +1,7 @@
 package config
 
 import (
-	configx "github.com/iamKienb/shopify-go-platform/config"
+	configx "github.com/iamKienb/go-core/config"
 )
 
 type UserCommandConfig struct {

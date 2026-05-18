@@ -13,7 +13,7 @@ import (
 	"user-worker-module/internal/bootstrap/module"
 
 	"github.com/elastic/go-elasticsearch/v8"
-	configx "github.com/iamKienb/shopify-go-platform/config"
+	configx "github.com/iamKienb/go-core/config"
 )
 
 type MigrationLog struct {
@@ -59,7 +59,7 @@ func main() {
 				log.Fatalf("failed to check history file %s: %v", filename, err)
 			}
 			if applied {
-				log.Printf("⏩ Skip: %s (applied)", fullHistoryKey)
+				log.Printf("Skip: %s (applied)", fullHistoryKey)
 				continue
 			}
 
@@ -73,14 +73,14 @@ func main() {
 				log.Fatalf("failed to init bootstrap for %s: %v", alias, err)
 			}
 
-			if err := saveLogHisFile(ctx, client, fullHistoryKey); err != nil {
+			if err := saveLogHistoryFile(ctx, client, fullHistoryKey); err != nil {
 				log.Fatalf("failed to write log for file %s: %v", filename, err)
 			}
 
 			log.Printf("Success: %s", fullHistoryKey)
 		}
 	}
-	log.Println("All migrations done!")
+	log.Println("All migrations done")
 }
 
 func isApplied(ctx context.Context, client *elasticsearch.TypedClient, fileName string) (bool, error) {
@@ -92,7 +92,7 @@ func isApplied(ctx context.Context, client *elasticsearch.TypedClient, fileName 
 	return res.Found, nil
 }
 
-func saveLogHisFile(ctx context.Context, client *elasticsearch.TypedClient, fileName string) error {
+func saveLogHistoryFile(ctx context.Context, client *elasticsearch.TypedClient, fileName string) error {
 	logEntry := MigrationLog{
 		Filename:  fileName,
 		AppliedAt: time.Now(),
@@ -106,6 +106,6 @@ func ensureMigrationIndex(ctx context.Context, client *elasticsearch.TypedClient
 	exists, _ := client.Indices.Exists(MigrationIndex).Do(ctx)
 	if !exists {
 		_, _ = client.Indices.Create(MigrationIndex).Do(ctx)
-		log.Printf("create index [%s] managed migration history", MigrationIndex)
+		log.Printf("Create index [%s] managed migration history", MigrationIndex)
 	}
 }

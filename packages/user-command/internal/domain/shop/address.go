@@ -67,3 +67,7 @@ func (e AddressTypeEnum) IsValidType() bool {
 
 	return false
 }
+
+func (e AddressTypeEnum) IsValid() bool {
+	return e.IsValidType()
+}

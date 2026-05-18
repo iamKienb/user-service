@@ -10,7 +10,7 @@ import (
 	"user-command-module/internal/bootstrap/config"
 	"user-command-module/internal/bootstrap/module"
 
-	configx "github.com/iamKienb/shopify-go-platform/config"
+	configx "github.com/iamKienb/go-core/config"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )

@@ -5,7 +5,7 @@ import (
 	"user-command-module/db/repository"
 	"user-command-module/internal/domain/auth"
 
-	pgx "github.com/iamKienb/shopify-go-platform/postgres"
+	pgx "github.com/iamKienb/go-core/postgres"
 )
 
 type authRepository struct {

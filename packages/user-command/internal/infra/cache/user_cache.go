@@ -6,7 +6,7 @@ import (
 	"time"
 	"user-command-module/internal/application/port"
 
-	redisx "github.com/iamKienb/shopify-go-platform/redis"
+	redisx "github.com/iamKienb/go-core/redis"
 )
 
 const emailCacheKey = "user-command:user:email:%s"

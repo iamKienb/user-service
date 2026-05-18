@@ -17,15 +17,3 @@ type ShopProfile struct {
 	CreatedAt time.Time
 	UpdatedAt *time.Time
 }
-
-func (p *ShopProfile) ValidateImage() error {
-	if p.LogoUrl == nil {
-		return ErrLogoMissing
-	}
-
-	if p.BannerUrl == nil {
-		return ErrBannerMissing
-	}
-
-	return nil
-}

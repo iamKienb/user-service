@@ -16,7 +16,7 @@ func toInfraClearMemberRoles(members []*shop.MemberAggregate) repository.ClearSh
 	memberIDs := make([]pgtype.UUID, 0, len(members))
 
 	for _, agg := range members {
-		if agg != nil {
+		if agg == nil {
 			continue
 		}
 
@@ -32,7 +32,7 @@ func toInfraClearMemberRoles(members []*shop.MemberAggregate) repository.ClearSh
 
 func toDomainMemberPermission(rows []repository.GetUserRolesInShopRow) *shop.MemberPermission {
 	if len(rows) == 0 {
-		return &shop.MemberPermission{}
+		return nil
 	}
 
 	roleIds := make([]shared.RoleID, 0, len(rows))
@@ -50,6 +50,14 @@ func toDomainMemberPermission(rows []repository.GetUserRolesInShopRow) *shop.Mem
 	}
 }
 
+func toNullableUUID(id *shared.UserID) pgtype.UUID {
+	if id == nil {
+		return pgtype.UUID{Valid: false}
+	}
+
+	return common.ToPgUUID(*id)
+}
+
 func toInfraGetUserRoleInShop(shopID shared.ShopID, userID shared.UserID) repository.GetUserRolesInShopParams {
 	return repository.GetUserRolesInShopParams{
 		ID:       common.ToPgUUID(shopID),
@@ -65,7 +73,7 @@ func toInfraShop(shop *shop.Shop) repository.SaveShopParams {
 		Slug:      shop.Slug,
 		Status:    string(shop.Status),
 		CreatedBy: common.ToPgUUID(shop.CreatedBy),
-		UpdatedBy: common.ToPgUUID(*shop.UpdatedBy),
+		UpdatedBy: toNullableUUID(shop.UpdatedBy),
 		CreatedAt: common.ToPgTimeStampZ(&shop.CreatedAt),
 		UpdatedAt: common.ToPgTimeStampZ(shop.UpdatedAt),
 	}
@@ -78,7 +86,7 @@ func toInfraProfile(profile *shop.ShopProfile) repository.SaveShopProfileParams 
 		LogoUrl:     common.ToPgText(profile.LogoUrl),
 		BannerUrl:   common.ToPgText(profile.BannerUrl),
 		CreatedBy:   common.ToPgUUID(profile.CreatedBy),
-		UpdatedBy:   common.ToPgUUID(*profile.UpdatedBy),
+		UpdatedBy:   toNullableUUID(profile.UpdatedBy),
 		CreatedAt:   common.ToPgTimeStampZ(&profile.CreatedAt),
 		UpdatedAt:   common.ToPgTimeStampZ(profile.UpdatedAt),
 	}
@@ -99,7 +107,7 @@ func toInfraMemberRoleBatch(members []*shop.MemberAggregate) (repository.AddShop
 	var roleIDs []int32
 
 	for _, agg := range members {
-		if agg != nil {
+		if agg == nil {
 			continue
 		}
 
@@ -127,4 +135,23 @@ func toInfraMemberRoleBatch(members []*shop.MemberAggregate) (repository.AddShop
 	}
 
 	return membersParams, memberRolesParams
+}
+
+func toInfraShopAddress(address *shop.ShopAddress) repository.SaveShopAddressParams {
+	return repository.SaveShopAddressParams{
+		ID:          common.ToPgUUID(address.ID),
+		ShopID:      common.ToPgUUID(address.ShopID),
+		CountryID:   int32(address.CountryID),
+		CityID:      int32(address.CityID),
+		DistrictID:  int32(address.DistrictID),
+		WardID:      int32(address.WardID),
+		AddressLine: address.AddressLine,
+		ContactName: address.ContactName,
+		PhoneNumber: address.PhoneNumber,
+		Type:        string(address.Type),
+		CreatedAt:   common.ToPgTimeStampZ(&address.CreatedAt),
+		UpdatedAt:   common.ToPgTimeStampZ(address.UpdatedAt),
+		CreatedBy:   toNullableUUID(address.CreatedBy),
+		UpdatedBy:   toNullableUUID(address.UpdatedBy),
+	}
 }

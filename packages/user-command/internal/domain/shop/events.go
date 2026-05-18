@@ -9,7 +9,7 @@ type ShopCreatedEvent struct {
 	ShopID      shared.ShopID
 	OwnerID     shared.UserID
 	Slug        string
-	Status      string
+	Status      ShopStatus
 	Description *string
 	LogoUrl     *string
 	BannerUrl   *string
@@ -26,11 +26,11 @@ func (e ShopCreatedEvent) IntegrationPayload() map[string]interface{} {
 		"shop_id":     e.ShopID.String(),
 		"owner_id":    e.OwnerID.String(),
 		"slug":        e.Slug,
-		"status":      e.Status,
-		"description": *e.Description,
-		"logo_url":    *e.LogoUrl,
-		"banner_url":  *e.BannerUrl,
-		"created_by":  e.CreatedBy,
+		"status":      string(e.Status),
+		"description": valueOrNil(e.Description),
+		"logo_url":    valueOrNil(e.LogoUrl),
+		"banner_url":  valueOrNil(e.BannerUrl),
+		"created_by":  e.CreatedBy.String(),
 		"created_at":  e.CreatedAt,
 	}
 }
@@ -52,7 +52,7 @@ type MemberAddedEvent struct {
 }
 
 func (e MemberAddedEvent) EventName() string {
-	return "shop.member_added"
+	return "user-service.shop.member_added"
 }
 
 func (e MemberAddedEvent) IntegrationPayload() map[string]interface{} {
@@ -74,4 +74,12 @@ func (e MemberAddedEvent) IntegrationPayload() map[string]interface{} {
 		"joined_at":     e.JoinedAt,
 		"roles":         rolesMap,
 	}
+}
+
+func valueOrNil(value *string) any {
+	if value == nil {
+		return nil
+	}
+
+	return *value
 }

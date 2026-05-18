@@ -29,7 +29,7 @@ func (r *accountRepository) SaveAggregate(ctx context.Context, agg *account.Aggr
 
 func (r *accountRepository) SaveAddress(ctx context.Context, addr *account.UserAddress) error {
 	if err := r.getQuerier(ctx).SaveUserAddress(ctx, toInfraUserAddress(addr)); err != nil {
-		return fmt.Errorf("infra: save user failed: %w", err)
+		return fmt.Errorf("infra: save user address failed: %w", err)
 	}
 
 	return nil

@@ -12,6 +12,15 @@ const (
 	LabelReturn LabelEnum = "RETURN"
 )
 
+func (e LabelEnum) IsValid() bool {
+	switch e {
+	case LabelPickup, LabelReturn:
+		return true
+	}
+
+	return false
+}
+
 type UserAddress struct {
 	ID     shared.UserAddressID
 	UserID shared.UserID

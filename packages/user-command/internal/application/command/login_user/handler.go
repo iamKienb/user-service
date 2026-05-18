@@ -2,15 +2,15 @@ package login_user
 
 import "context"
 
-type userService interface {
+type service interface {
 	Login(ctx context.Context, cmd Command) (*Result, error)
 }
 
 type handler struct {
-	service userService
+	service service
 }
 
-func NewHandler(service userService) Executor {
+func NewHandler(service service) Executor {
 	return &handler{service: service}
 }
 

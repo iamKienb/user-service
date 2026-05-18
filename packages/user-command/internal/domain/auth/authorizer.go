@@ -10,7 +10,13 @@ var (
 	roleOwnerManager          = []shared.RoleID{shop.RoleOwnerID, shop.RoleManagerID}
 )
 
-type IAuthorizer interface {
+const (
+	ActionProductCreate     = "product:create"
+	ActionShopAddMember     = "shop:add_member"
+	ActionShopManageAddress = "shop:manage_addresses"
+)
+
+type Authorizer interface {
 	Authorize(action string, roleIDs []shared.RoleID) error
 }
 
@@ -19,19 +25,22 @@ type PermissionRule struct {
 	Error        error
 }
 
-type Authorizer struct {
+type ruleAuthorizer struct {
 	rules map[string]PermissionRule
-	Error error
 }
 
-func NewAuthorizer() IAuthorizer {
-	return &Authorizer{
+func NewAuthorizer() Authorizer {
+	return &ruleAuthorizer{
 		rules: map[string]PermissionRule{
-			"product:create": {
+			ActionProductCreate: {
 				AllowedRoles: roleOwnerManagerMarketing,
 				Error:        ErrProductDenied,
 			},
-			"shop:add_member": {
+			ActionShopAddMember: {
+				AllowedRoles: roleOwnerManager,
+				Error:        ErrShopDenied,
+			},
+			ActionShopManageAddress: {
 				AllowedRoles: roleOwnerManager,
 				Error:        ErrShopDenied,
 			},
@@ -39,10 +48,10 @@ func NewAuthorizer() IAuthorizer {
 	}
 }
 
-func (a *Authorizer) Authorize(action string, roleIDs []shared.RoleID) error {
+func (a *ruleAuthorizer) Authorize(action string, roleIDs []shared.RoleID) error {
 	rule, exists := a.rules[action]
 	if !exists {
-		return ErrorAction
+		return ErrActionNotDefined
 	}
 
 	userRoleMap := make(map[shared.RoleID]struct{}, len(roleIDs))

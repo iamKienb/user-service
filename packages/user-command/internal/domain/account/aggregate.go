@@ -98,7 +98,7 @@ func (a *Aggregate) EnsureCredential() error {
 	return nil
 }
 
-func (a *Aggregate) CheckActiveIfLogin() error {
+func (a *Aggregate) EnsureActiveForLogin() error {
 	if err := a.EnsureCredential(); err != nil {
 		return err
 	}

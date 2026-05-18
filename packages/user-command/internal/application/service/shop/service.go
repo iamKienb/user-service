@@ -21,7 +21,7 @@ type Service interface {
 
 type shopService struct {
 	shopRepo      shop.Repository
-	authorizer    auth.IAuthorizer
+	authorizer    auth.Authorizer
 	outboxService outbox.Service
 	shopCache     port.ShopCache
 	txManager     port.TxManager
@@ -29,7 +29,7 @@ type shopService struct {
 
 func NewShopService(
 	shopRepo shop.Repository,
-	authorizer auth.IAuthorizer,
+	authorizer auth.Authorizer,
 	outboxService outbox.Service,
 	shopCache port.ShopCache,
 	txManager port.TxManager,

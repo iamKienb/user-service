@@ -9,7 +9,7 @@ import (
 	"strings"
 	"user-command-module/internal/application/port"
 
-	configx "github.com/iamKienb/shopify-go-platform/config"
+	configx "github.com/iamKienb/go-core/config"
 	"golang.org/x/crypto/argon2"
 )
 

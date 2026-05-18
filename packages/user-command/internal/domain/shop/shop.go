@@ -37,7 +37,3 @@ func (s *Shop) MatchesSlug(slug string) bool {
 func (s *Shop) IsActive() bool {
 	return s.Status == StatusActive
 }
-
-func (s *Shop) IsDisabled(status ShopStatus) bool {
-	return s.Status == StatusInActive || s.Status == StatusDeleted
-}

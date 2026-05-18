@@ -4,17 +4,19 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 	"user-shared-module/events"
 	"user-worker-module/internal/bootstrap/config"
 	"user-worker-module/internal/bootstrap/module"
-	kafkax "user-worker-module/internal/infra/kafka"
 
-	configx "github.com/iamKienb/shopify-go-platform/config"
+	configx "github.com/iamKienb/go-core/config"
+	kafkax "github.com/iamKienb/go-core/kafka"
 )
 
 type App struct {
-	logger *slog.Logger
-	infra  *module.InfraModule
+	logger    *slog.Logger
+	infra     *module.InfraModule
+	consumers []*kafkax.Consumer
 }
 
 func NewApp(logger *slog.Logger) *App {
@@ -39,21 +41,59 @@ func (a *App) Start(ctx context.Context) error {
 	cfg.Consumer.Topics = events.Topics
 	application := module.NewApplicationModule(infra)
 
-	consumer, err := kafkax.NewConsumer(infra.Kafka, cfg.Consumer, a.logger, application.EventProcessor)
-	if err != nil {
-		return fmt.Errorf("create consumer: %w", err)
+	consumers := make([]*kafkax.Consumer, 0, len(cfg.Consumer.Topics))
+	for _, topic := range cfg.Consumer.Topics {
+		consumer, err := kafkax.NewConsumer(infra.Kafka, cfg.Consumer, a.logger, application.EventProcessor)
+		if err != nil {
+			return fmt.Errorf("create consumer for topic %s: %w", topic, err)
+		}
+		consumers = append(consumers, consumer)
 	}
-	consumer.Start(ctx)
+	a.consumers = consumers
 
-	a.logger.Info("starting user worker")
+	a.logger.Info("starting user worker", slog.Any("topics", cfg.Consumer.Topics))
 
-	return nil
+	errCh := make(chan error, len(consumers))
+	var wg sync.WaitGroup
+	for _, consumer := range consumers {
+		wg.Add(1)
+		go func(consumer *kafkax.Consumer) {
+			defer wg.Done()
+			errCh <- consumer.Start(ctx)
+		}(consumer)
+	}
+
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case err, ok := <-errCh:
+			if !ok {
+				return nil
+			}
+			if err != nil {
+				return fmt.Errorf("consumer loop: %w", err)
+			}
+		}
+	}
 }
 
 func (a *App) Stop(ctx context.Context) error {
 	a.logger.Info("shutting down")
 
 	if a.infra != nil {
+		for _, consumer := range a.consumers {
+			if consumer != nil {
+				a.logger.Info("closing kafka consumer...")
+				_ = consumer.Close()
+			}
+		}
+
 		if a.infra.Kafka != nil {
 			a.logger.Info("closing kafka client...")
 			_ = a.infra.Kafka.Close()

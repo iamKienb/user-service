@@ -4,7 +4,7 @@ import (
 	"context"
 	"user-worker-module/internal/application/port"
 
-	esx "github.com/iamKienb/shopify-go-platform/elasticsearch"
+	esx "github.com/iamKienb/go-core/elasticsearch"
 )
 
 type esRepository struct {

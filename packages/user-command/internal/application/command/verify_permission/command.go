@@ -13,7 +13,7 @@ type Command struct {
 
 type Result struct {
 	IsAllowed    bool
-	ErrorMessage error
+	ErrorMessage string
 }
 
 type Executor interface {

@@ -6,7 +6,7 @@ import (
 	"user-command-module/db/repository"
 	"user-command-module/internal/domain/shop"
 
-	pgx "github.com/iamKienb/shopify-go-platform/postgres"
+	pgx "github.com/iamKienb/go-core/postgres"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 

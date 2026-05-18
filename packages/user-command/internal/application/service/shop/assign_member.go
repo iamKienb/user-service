@@ -10,7 +10,7 @@ import (
 )
 
 func (s *shopService) AssignMember(ctx context.Context, cmd assign_member.Command) (*assign_member.Result, error) {
-	userRoleIDs, err := s.GetRolesUser(ctx, cmd.ShopID, cmd.User.ID)
+	userRoleIDs, err := s.getUserRoles(ctx, cmd.ShopID, cmd.User.ID)
 	if err != nil {
 		return nil, s.wrapError(err)
 	}
@@ -72,7 +72,7 @@ func (s *shopService) AssignMember(ctx context.Context, cmd assign_member.Comman
 	}, nil
 }
 
-func (s *shopService) GetRolesUser(ctx context.Context, shopID domain_shared.ShopID, userID domain_shared.UserID) ([]domain_shared.RoleID, error) {
+func (s *shopService) getUserRoles(ctx context.Context, shopID domain_shared.ShopID, userID domain_shared.UserID) ([]domain_shared.RoleID, error) {
 	data, err := s.shopRepo.GetUserRolesInShop(ctx, shopID, userID)
 	if err != nil {
 		return nil, err

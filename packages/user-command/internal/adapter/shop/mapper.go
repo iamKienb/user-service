@@ -1,13 +1,14 @@
 package shop
 
 import (
-	"fmt"
 	"user-command-module/internal/application/command/add_shop_address"
 	"user-command-module/internal/application/command/assign_member"
 	"user-command-module/internal/application/command/create_shop"
 	"user-command-module/internal/application/command/verify_permission"
 	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/auth"
 	"user-command-module/internal/domain/shared"
+	domain_shop "user-command-module/internal/domain/shop"
 
 	"github.com/iamKienb/api-contract/gen/shop"
 )
@@ -23,7 +24,7 @@ func ToCreateShopCommand(userID string, userName string, req *shop.CreateShopReq
 	}
 	userParse, err := shared.ParseToRawID[shared.UserID](userID)
 	if err != nil {
-		return create_shop.Command{}, fmt.Errorf("invalid userID: %w", err)
+		return create_shop.Command{}, account.ErrUserInvalid
 	}
 
 	return create_shop.Command{
@@ -46,11 +47,11 @@ func ToCreateShopResponse(result *create_shop.Result) *shop.CreateShopResponse {
 func ToAssignMemberCommand(userID string, userName string, req *shop.AssignMemberRolesRequest) (assign_member.Command, error) {
 	shopID, err := shared.ParseToRawID[shared.ShopID](req.GetShopId())
 	if err != nil {
-		return assign_member.Command{}, fmt.Errorf("invalid shopID: %w", err)
+		return assign_member.Command{}, domain_shop.ErrShopInvalid
 	}
 	userParse, err := shared.ParseToRawID[shared.UserID](userID)
 	if err != nil {
-		return assign_member.Command{}, fmt.Errorf("invalid userID: %w", err)
+		return assign_member.Command{}, account.ErrUserInvalid
 	}
 
 	reqMemberRoles := req.GetMemberRoles()
@@ -59,7 +60,7 @@ func ToAssignMemberCommand(userID string, userName string, req *shop.AssignMembe
 	for _, memberRole := range reqMemberRoles {
 		memberID, err := shared.ParseToRawID[shared.UserID](memberRole.GetId())
 		if err != nil {
-			return assign_member.Command{}, fmt.Errorf("invalid memberID: %w", err)
+			return assign_member.Command{}, account.ErrUserInvalid
 		}
 
 		reqRoleIDs := memberRole.GetRoleIDs()
@@ -71,6 +72,7 @@ func ToAssignMemberCommand(userID string, userName string, req *shop.AssignMembe
 
 		memberRoles = append(memberRoles, assign_member.MemberRole{
 			ID:      memberID,
+			Name:    memberRole.GetName(),
 			RoleIDs: roleIDs,
 		})
 	}
@@ -82,7 +84,7 @@ func ToAssignMemberCommand(userID string, userName string, req *shop.AssignMembe
 		},
 		ShopID:      shopID,
 		MemberRoles: memberRoles,
-		Action:      req.GetAction(),
+		Action:      auth.ActionShopAddMember,
 	}, nil
 }
 
@@ -92,36 +94,24 @@ func ToAssignMemberResponse(result *assign_member.Result) *shop.AssignMemberRole
 	}
 }
 
-func ToAddAddressCommand(req *shop.AddShopAddressRequest) (add_shop_address.Command, error) {
-	userID, err := shared.ParseToRawID[shared.UserID](req.GetUserId())
+func ToAddAddressCommand(userID string, req *shop.AddShopAddressRequest) (add_shop_address.Command, error) {
+	parsedUserID, err := shared.ParseToRawID[shared.UserID](userID)
 	if err != nil {
 		return add_shop_address.Command{}, account.ErrUserInvalid
 	}
 	shopID, err := shared.ParseToRawID[shared.ShopID](req.GetShopId())
 	if err != nil {
-		return add_shop_address.Command{}, fmt.Errorf("invalid shopID: %w", err)
+		return add_shop_address.Command{}, domain_shop.ErrShopInvalid
 	}
 
 	return add_shop_address.Command{
-		UserID: userID,
+		UserID: parsedUserID,
 		ShopID: shopID,
 
-		Country: add_shop_address.LocationInfo{
-			ID:   int(req.Country.GetId()),
-			Name: req.Country.GetName(),
-		},
-		City: add_shop_address.LocationInfo{
-			ID:   int(req.City.GetId()),
-			Name: req.City.GetName(),
-		},
-		District: add_shop_address.LocationInfo{
-			ID:   int(req.District.GetId()),
-			Name: req.District.GetName(),
-		},
-		Ward: add_shop_address.LocationInfo{
-			ID:   int(req.Ward.GetId()),
-			Name: req.Ward.GetName(),
-		},
+		Country:  toShopLocationInfo(req.GetCountry()),
+		City:     toShopLocationInfo(req.GetCity()),
+		District: toShopLocationInfo(req.GetDistrict()),
+		Ward:     toShopLocationInfo(req.GetWard()),
 
 		AddressLine: req.GetAddressLine(),
 		ContactName: req.GetContactName(),
@@ -136,34 +126,44 @@ func ToAddAddressResponse(result *add_shop_address.Result) *shop.AddShopAddressR
 	}
 }
 
-func ToVerifyPermissionCommand(req *shop.VerifyPermissionRequest) (verify_permission.Command, error) {
-	userID, err := shared.ParseToRawID[shared.UserID](req.GetUserId())
+func ToVerifyPermissionCommand(userID string, req *shop.VerifyPermissionRequest) (verify_permission.Command, error) {
+	parsedUserID, err := shared.ParseToRawID[shared.UserID](userID)
 	if err != nil {
 		return verify_permission.Command{}, account.ErrUserInvalid
 	}
 
 	shopID, err := shared.ParseToRawID[shared.ShopID](req.GetShopId())
 	if err != nil {
-		return verify_permission.Command{}, fmt.Errorf("invalid shopID: %w", err)
+		return verify_permission.Command{}, domain_shop.ErrShopInvalid
 	}
 
 	return verify_permission.Command{
 		ShopID: shopID,
-		UserID: userID,
+		UserID: parsedUserID,
 		Action: req.GetAction(),
 	}, nil
 
 }
 
 func ToVerifyPermissionResponse(result *verify_permission.Result) *shop.VerifyPermissionResponse {
-	var errMsg string
-
-	if result.ErrorMessage != nil {
-		errMsg = result.ErrorMessage.Error()
-	}
-
 	return &shop.VerifyPermissionResponse{
 		IsAllowed:    result.IsAllowed,
-		ErrorMessage: errMsg,
+		ErrorMessage: result.ErrorMessage,
+	}
+}
+
+type shopLocationSource interface {
+	GetId() int64
+	GetName() string
+}
+
+func toShopLocationInfo(src shopLocationSource) add_shop_address.LocationInfo {
+	if src == nil {
+		return add_shop_address.LocationInfo{}
+	}
+
+	return add_shop_address.LocationInfo{
+		ID:   int(src.GetId()),
+		Name: src.GetName(),
 	}
 }

@@ -3,7 +3,8 @@ package port
 import (
 	"context"
 	"encoding/json"
-	kafkax "user-worker-module/internal/infra/kafka"
+
+	kafkax "github.com/iamKienb/go-core/kafka"
 )
 
 type Message = kafkax.Message

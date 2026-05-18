@@ -16,9 +16,9 @@ import (
 	shopPg "user-command-module/internal/infra/postgres/shop"
 	"user-command-module/internal/infra/security"
 
-	jwtx "github.com/iamKienb/shopify-go-platform/jwt"
-	pgx "github.com/iamKienb/shopify-go-platform/postgres"
-	redisx "github.com/iamKienb/shopify-go-platform/redis"
+	jwtx "github.com/iamKienb/go-core/jwt"
+	pgx "github.com/iamKienb/go-core/postgres"
+	redisx "github.com/iamKienb/go-core/redis"
 )
 
 type InfraModule struct {

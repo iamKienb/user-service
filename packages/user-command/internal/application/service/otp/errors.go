@@ -5,7 +5,7 @@ import (
 	"user-command-module/internal/domain/account"
 	"user-command-module/internal/domain/auth"
 
-	"github.com/iamKienb/shopify-go-platform/app_error"
+	"github.com/iamKienb/go-core/app_error"
 )
 
 var otpErrorMap = app_error.ServiceErrorMap{

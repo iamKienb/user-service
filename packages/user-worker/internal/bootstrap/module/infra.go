@@ -6,9 +6,9 @@ import (
 	"user-worker-module/internal/application/port"
 	"user-worker-module/internal/bootstrap/config"
 	"user-worker-module/internal/infra/elasticsearch"
-	kafkax "user-worker-module/internal/infra/kafka"
 
-	esx "github.com/iamKienb/shopify-go-platform/elasticsearch"
+	esx "github.com/iamKienb/go-core/elasticsearch"
+	kafkax "github.com/iamKienb/go-core/kafka"
 )
 
 type InfraModule struct {
