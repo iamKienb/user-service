@@ -1,0 +1,68 @@
+package user
+
+import (
+	"context"
+	"user-command-module/internal/application/commands/add_user_address"
+	"user-command-module/internal/application/commands/login_user"
+	"user-command-module/internal/application/commands/register_user"
+	"user-command-module/internal/application/port"
+	"user-command-module/internal/application/services/outbox"
+	"user-command-module/internal/domain/address"
+	"user-command-module/internal/domain/auth"
+	"user-command-module/internal/domain/profile"
+	"user-command-module/internal/domain/user"
+)
+
+type Service interface {
+	Register(ctx context.Context, cmd register_user.Command) (*register_user.Result, error)
+	Login(ctx context.Context, cmd login_user.Command) (*login_user.Result, error)
+	AddAddress(ctx context.Context, cmd add_user_address.Command) (*add_user_address.Result, error)
+}
+
+type userService struct {
+	userRepo        user.Repository
+	authRepo        auth.Repository
+	profileRepo     profile.Repository
+	userAddressRepo address.Repository
+
+	outboxService outbox.Service
+
+	userCache port.UserCache
+	otpCache  port.OTPCache
+
+	txManager port.TxManager
+	tokenGen  port.TokenService
+	hasher    port.PasswordHasher
+}
+
+func NewUserService(
+	userRepo user.Repository,
+	authRepo auth.Repository,
+	profileRepo profile.Repository,
+	userAddressRepo address.Repository,
+
+	outboxService outbox.Service,
+
+	userCache port.UserCache,
+	otpCache port.OTPCache,
+
+	tokenGen port.TokenService,
+	txManager port.TxManager,
+	hasher port.PasswordHasher,
+) Service {
+	return &userService{
+		userRepo:        userRepo,
+		authRepo:        authRepo,
+		profileRepo:     profileRepo,
+		userAddressRepo: userAddressRepo,
+
+		outboxService: outboxService,
+
+		userCache: userCache,
+		otpCache:  otpCache,
+
+		tokenGen:  tokenGen,
+		txManager: txManager,
+		hasher:    hasher,
+	}
+}

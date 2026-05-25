@@ -7,11 +7,11 @@ type Validate interface {
 	IsValid() bool
 }
 
-func ValidateEnum[T Validate](input string, err error) (T, error) {
+func ValidateEnum[T Validate](input string) *T {
 	value := T(strings.ToUpper(strings.TrimSpace(input)))
 	if !value.IsValid() {
-		return "", err
+		return nil
 	}
 
-	return value, nil
+	return &value
 }

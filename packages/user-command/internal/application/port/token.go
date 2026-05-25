@@ -2,14 +2,14 @@ package port
 
 import (
 	"time"
-	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/user"
 )
 
 type UserClaims struct {
 	UserID          string
 	Email           string
 	FullName        string
-	Roles           []account.RoleEnum
+	Roles           []user.RoleEnum
 	PasswordVersion int
 }
 

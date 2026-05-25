@@ -1,11 +1,11 @@
 package user
 
 import (
-	"user-command-module/internal/application/command/add_user_address"
-	"user-command-module/internal/application/command/login_user"
-	"user-command-module/internal/application/command/register_user"
-	"user-command-module/internal/domain/account"
+	"user-command-module/internal/application/commands/add_user_address"
+	"user-command-module/internal/application/commands/login_user"
+	"user-command-module/internal/application/commands/register_user"
 	"user-command-module/internal/domain/shared"
+	domain_user "user-command-module/internal/domain/user"
 
 	"github.com/iamKienb/api-contract/gen/user"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -50,7 +50,7 @@ func ToLoginResponse(result *login_user.Result) *user.LoginUserResponse {
 func ToAddAddressCommand(userID string, req *user.AddUserAddressRequest) (add_user_address.Command, error) {
 	parsedUserID, err := shared.ParseToRawID[shared.UserID](userID)
 	if err != nil {
-		return add_user_address.Command{}, account.ErrUserInvalid
+		return add_user_address.Command{}, domain_user.ErrUserInvalid
 
 	}
 	return add_user_address.Command{

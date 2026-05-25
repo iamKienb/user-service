@@ -1,4 +1,4 @@
--- name: SaveUserAddress :exec
+-- name: CreateUserAddress :exec
 INSERT INTO user_addresses (
     id,
     user_id, 

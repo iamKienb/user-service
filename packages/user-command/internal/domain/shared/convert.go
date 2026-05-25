@@ -18,3 +18,19 @@ func ParseToRawID[T ~[16]byte](ID string) (T, error) {
 
 	return T(parsed), nil
 }
+
+func Strings[T ~string](items []T) []string {
+	result := make([]string, len(items))
+	for i, v := range items {
+		result[i] = string(v)
+	}
+	return result
+}
+
+func FromStrings[T ~string](items []string) []T {
+	result := make([]T, len(items))
+	for i, v := range items {
+		result[i] = T(v)
+	}
+	return result
+}

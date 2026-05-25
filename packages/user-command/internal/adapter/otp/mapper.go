@@ -1,8 +1,8 @@
 package otp
 
 import (
-	"user-command-module/internal/application/command/resend_otp"
-	"user-command-module/internal/application/command/verify_otp"
+	"user-command-module/internal/application/commands/resend_otp"
+	"user-command-module/internal/application/commands/verify_otp"
 
 	"github.com/iamKienb/api-contract/gen/otp"
 	"google.golang.org/protobuf/types/known/timestamppb"

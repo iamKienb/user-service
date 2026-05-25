@@ -28,11 +28,6 @@ func (h *UserRegisterHandler) Handle(ctx context.Context, raw json.RawMessage) e
 		"status":     payload.Status,
 		"roles":      payload.Roles,
 		"created_at": payload.CreatedAt,
-		"profile": map[string]any{
-			"user_id":   payload.UserID,
-			"full_name": payload.FullName,
-			"gender":    payload.Gender,
-		},
 	}
 
 	return h.repo.SyncData(ctx, h.alias, payload.UserID, doc)

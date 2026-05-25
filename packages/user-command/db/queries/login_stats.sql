@@ -1,5 +1,5 @@
--- name: SaveLoginStats :exec
-INSERT INTO login_stats (
+-- name: SaveLoginAttempt :exec
+INSERT INTO login_attempts (
     user_id,
     failed_count,
     lock_until,
@@ -13,7 +13,7 @@ ON CONFLICT (user_id) DO UPDATE SET
     last_failed_at = EXCLUDED.last_failed_at,
     updated_at = EXCLUDED.updated_at;
 
--- name: GetLoginStatsByID :one
+-- name: FindLoginAttemptsByID :one
 SELECT *
-FROM login_stats
+FROM login_attempts
 WHERE user_id = $1;

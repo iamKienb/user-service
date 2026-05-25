@@ -1,4 +1,4 @@
--- name: SaveUser :exec
+-- name: CreateUser :exec
 INSERT INTO users (
     id,
     email,
@@ -11,12 +11,12 @@ INSERT INTO users (
 )
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
 
--- name: GetUserByID :one
+-- name: FindUserByID :one
 SELECT * 
 FROM users
 WHERE id = $1;
 
--- name: GetUserByEmail :one
+-- name: FindUserByEmail :one
 SELECT * 
 FROM users
 WHERE email = $1;

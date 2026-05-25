@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"user-query-module/internal/bootstrap/config"
 	"user-query-module/internal/bootstrap/module"
-	"user-shared-module/indexing"
 
 	configx "github.com/iamKienb/go-core/config"
 )
@@ -36,7 +35,7 @@ func (a *App) Start(ctx context.Context) error {
 		return err
 	}
 
-	a.logger.Info("starting user query", slog.Any("aliases", []string{indexing.UserAlias, indexing.ShopAlias}))
+	a.logger.Info("starting user query")
 
 	<-ctx.Done()
 	return nil
@@ -58,13 +57,6 @@ func (a *App) Stop(ctx context.Context) error {
 }
 
 func (a *App) bootstrapIndices(ctx context.Context) error {
-	if err := a.infra.ESService.BootstrapIndex(ctx, indexing.UserAlias, indexing.UserMapping); err != nil {
-		return fmt.Errorf("bootstrap user index: %w", err)
-	}
-
-	if err := a.infra.ESService.BootstrapIndex(ctx, indexing.ShopAlias, indexing.ShopMapping); err != nil {
-		return fmt.Errorf("bootstrap shop index: %w", err)
-	}
 
 	return nil
 }

@@ -6,14 +6,17 @@ import (
 
 	"user-command-module/internal/application/port"
 	"user-command-module/internal/bootstrap/config"
-	"user-command-module/internal/domain/account"
+	"user-command-module/internal/domain/address"
 	"user-command-module/internal/domain/auth"
-	"user-command-module/internal/domain/shop"
+	"user-command-module/internal/domain/profile"
+	"user-command-module/internal/domain/user"
 	"user-command-module/internal/infra/cache"
-	accountPg "user-command-module/internal/infra/postgres/account"
-	authPg "user-command-module/internal/infra/postgres/auth"
+	addressPg "user-command-module/internal/infra/postgres/address"
+	loginPg "user-command-module/internal/infra/postgres/login"
+	profilePg "user-command-module/internal/infra/postgres/profile"
+	userPg "user-command-module/internal/infra/postgres/user"
+
 	outboxPg "user-command-module/internal/infra/postgres/outbox"
-	shopPg "user-command-module/internal/infra/postgres/shop"
 	"user-command-module/internal/infra/security"
 
 	jwtx "github.com/iamKienb/go-core/jwt"
@@ -25,14 +28,14 @@ type InfraModule struct {
 	PGService    pgx.PGXService
 	RedisService redisx.RedisXService
 
-	AccountRepo account.Repository
-	AuthRepo    auth.Repository
-	OutboxRepo  port.OutboxRepository
-	ShopRepo    shop.Repository
+	UserRepo        user.Repository
+	AuthRepo        auth.Repository
+	ProfileRepo     profile.Repository
+	UserAddressRepo address.Repository
+	OutboxRepo      port.OutboxRepository
 
 	UserCache port.UserCache
 	OtpCache  port.OTPCache
-	ShopCache port.ShopCache
 
 	TxManager      port.TxManager
 	Hasher         port.PasswordHasher
@@ -59,14 +62,14 @@ func NewInfraModule(ctx context.Context, cfg *config.UserCommandConfig) (*InfraM
 		PGService:    pgService,
 		RedisService: redisService,
 
-		AccountRepo: accountPg.NewRepository(pgService),
-		AuthRepo:    authPg.NewRepository(pgService),
-		OutboxRepo:  outboxPg.NewRepository(pgService),
-		ShopRepo:    shopPg.NewRepository(pgService),
+		UserRepo:        userPg.NewRepository(pgService),
+		AuthRepo:        loginPg.NewRepository(pgService),
+		ProfileRepo:     profilePg.NewRepository(pgService),
+		UserAddressRepo: addressPg.NewRepository(pgService),
+		OutboxRepo:      outboxPg.NewRepository(pgService),
 
 		UserCache: cache.NewUserCache(redisService),
 		OtpCache:  cache.NewOTPCache(redisService),
-		ShopCache: cache.NewShopCache(redisService),
 
 		TxManager:      pgx.NewTxManager(pgService.GetPool()),
 		Hasher:         security.NewArgon2Hasher(cfg.Argon2),

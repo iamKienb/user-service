@@ -11,25 +11,20 @@ type UserAddressAdded struct {
 	CountryID   int    `json:"country_id"`
 	CountryName string `json:"country_name"`
 
-	CityID   int
-	CityName string
+	CityID   int    `json:"city_id"`
+	CityName string `json:"city_name"`
 
-	DistrictID   int
-	DistrictName string
+	DistrictID   int    `json:"district_id"`
+	DistrictName string `json:"district_name"`
 
-	WardID   int
-	WardName string
+	WardID   int    `json:"ward_id"`
+	WardName string `json:"ward_name"`
 
-	AddressLine  string
-	ReceiverName string
-	PhoneNumber  string
-	Label        string
-	IsDefault    bool
+	AddressLine  string `json:"address_line"`
+	ReceiverName string `json:"receiver_name"`
+	PhoneNumber  string `json:"phone_number"`
+	Label        string `json:"label"`
+	IsDefault    bool   `json:"is_default"`
 
-	created_at time.Time
-	updated_at time.Time
-}
-
-func (u UserAddressAdded) EventName() string {
-	return TopicUserAddressAdded
+	CreatedAt time.Time `json:"created_at"`
 }

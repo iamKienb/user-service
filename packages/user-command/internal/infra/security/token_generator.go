@@ -2,7 +2,7 @@ package security
 
 import (
 	"user-command-module/internal/application/port"
-	"user-shared-module/common"
+	"user-command-module/internal/domain/shared"
 
 	jwtx "github.com/iamKienb/go-core/jwt"
 )
@@ -21,7 +21,7 @@ func (g *TokenGenerator) GeneratePair(claims port.UserClaims) (*port.TokenPair, 
 	pair, err := g.service.GeneratePair(jwtx.Claims{
 		UserID:          claims.UserID,
 		Email:           claims.Email,
-		Roles:           common.ToStringSlice(claims.Roles),
+		Roles:           shared.Strings(claims.Roles),
 		PasswordVersion: claims.PasswordVersion,
 	})
 	if err != nil {

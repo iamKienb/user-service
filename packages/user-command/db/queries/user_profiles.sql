@@ -1,4 +1,4 @@
--- name: SaveUserProfile :exec
+-- name: CreateUserProfile :exec
 INSERT INTO user_profiles (
     user_id,
     full_name,
@@ -11,7 +11,7 @@ INSERT INTO user_profiles (
 )
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
 
--- name: GetUserProfileByID :one
+-- name: FindUserProfileByID :one
 SELECT *
 FROM user_profiles
 WHERE user_id = $1;

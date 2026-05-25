@@ -4,22 +4,22 @@ import (
 	"encoding/json"
 	"user-command-module/db/repository"
 	"user-command-module/internal/application/port"
-	"user-shared-module/common"
 
+	"github.com/iamKienb/go-core/postgres/conv"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func toInfraOutbox(e *port.OutboxEvent) repository.SaveOutboxParams {
 	payload, _ := json.Marshal(e.Payload)
 	return repository.SaveOutboxParams{
-		ID:             common.ToPgUUID(e.ID),
-		AggregateID:    common.ToPgUUID(e.AggregateID),
+		ID:             conv.UUID(e.ID),
+		AggregateID:    conv.UUID(e.AggregateID),
 		AggregateType:  e.AggregateType,
 		EventType:      e.EventType,
 		Payload:        payload,
 		PartitionKey:   e.PartitionKey,
-		IdempotencyKey: common.ToPgUUID(e.IdempotencyKey),
-		CreatedAt:      common.ToPgTimeStampZ(&e.CreatedAt),
+		IdempotencyKey: conv.UUID(e.IdempotencyKey),
+		CreatedAt:      conv.TimeStampZ(&e.CreatedAt),
 	}
 }
 
@@ -43,14 +43,14 @@ func toInfraOutboxBatch(events []port.OutboxEvent) repository.SaveOutboxBatchPar
 			payload = []byte("{}")
 		}
 
-		params.Ids[i] = common.ToPgUUID(e.ID)
-		params.AggregateIds[i] = common.ToPgUUID(e.AggregateID)
+		params.Ids[i] = conv.UUID(e.ID)
+		params.AggregateIds[i] = conv.UUID(e.AggregateID)
 		params.AggregateTypes[i] = e.AggregateType
 		params.EventTypes[i] = e.EventType
 		params.Payloads[i] = payload
 		params.PartitionKeys[i] = e.PartitionKey
-		params.IdempotencyKeys[i] = common.ToPgUUID(e.IdempotencyKey)
-		params.CreatedAts[i] = common.ToPgTimeStampZ(&e.CreatedAt)
+		params.IdempotencyKeys[i] = conv.UUID(e.IdempotencyKey)
+		params.CreatedAts[i] = conv.TimeStampZ(&e.CreatedAt)
 	}
 
 	return params

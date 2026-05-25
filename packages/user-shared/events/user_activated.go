@@ -9,7 +9,3 @@ type UserActivated struct {
 	Status    string    `json:"status"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
-
-func (p UserActivated) EventName() string {
-	return TopicUserActivated
-}

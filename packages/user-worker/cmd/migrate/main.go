@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"time"
-	"user-shared-module/indexing"
+	"user-shared-module/alias"
 	"user-worker-module/internal/bootstrap/config"
 	"user-worker-module/internal/bootstrap/module"
 
@@ -39,47 +39,46 @@ func main() {
 	client := infra.ESService.GetClient()
 	ensureMigrationIndex(ctx, client)
 
-	validAliases := []string{indexing.UserAlias, indexing.ShopAlias}
+	alias := alias.UserAlias
+	pattern := "migrations/*.json"
 
-	for _, alias := range validAliases {
-		pattern := fmt.Sprintf("es_migrations/%s/*.json", alias)
-		files, err := filepath.Glob(pattern)
-		if err != nil {
-			log.Fatalf("failed to list migration files for alias %s: %v", alias, err)
-		}
-
-		sort.Strings(files)
-
-		for _, file := range files {
-			filename := filepath.Base(file)
-			fullHistoryKey := fmt.Sprintf("%s_%s", alias, filename)
-
-			applied, err := isApplied(ctx, client, fullHistoryKey)
-			if err != nil {
-				log.Fatalf("failed to check history file %s: %v", filename, err)
-			}
-			if applied {
-				log.Printf("Skip: %s (applied)", fullHistoryKey)
-				continue
-			}
-
-			content, err := os.ReadFile(file)
-			if err != nil {
-				log.Fatalf("cannot read file %s: %v", filename, err)
-			}
-
-			log.Printf("Migrating [%s]: %s", alias, filename)
-			if err = infra.ESService.BootstrapIndex(ctx, alias, string(content)); err != nil {
-				log.Fatalf("failed to init bootstrap for %s: %v", alias, err)
-			}
-
-			if err := saveLogHistoryFile(ctx, client, fullHistoryKey); err != nil {
-				log.Fatalf("failed to write log for file %s: %v", filename, err)
-			}
-
-			log.Printf("Success: %s", fullHistoryKey)
-		}
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		log.Fatalf("failed to get list migration files %v", err)
 	}
+
+	sort.Strings(files)
+
+	for _, file := range files {
+		filename := filepath.Base(file)
+		fullHistoryKey := fmt.Sprintf("%s_%s", alias, filename)
+
+		applied, err := isApplied(ctx, client, fullHistoryKey)
+		if err != nil {
+			log.Fatalf("failed to check history file %s: %v", filename, err)
+		}
+		if applied {
+			log.Printf("Skip: %s (applied)", fullHistoryKey)
+			continue
+		}
+
+		content, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("cannot read file %s: %v", filename, err)
+		}
+
+		log.Printf("Migrating [%s]:", filename)
+		if err = infra.ESService.BootstrapIndex(ctx, alias, string(content)); err != nil {
+			log.Fatalf("failed to init bootstrap for %s: %v", alias, err)
+		}
+
+		if err := saveLogHistoryFile(ctx, client, fullHistoryKey); err != nil {
+			log.Fatalf("failed to write log for file %s: %v", filename, err)
+		}
+
+		log.Printf("Success: %s", fullHistoryKey)
+	}
+
 	log.Println("All migrations done")
 }
 

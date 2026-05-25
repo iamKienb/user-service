@@ -2,9 +2,9 @@ package user
 
 import (
 	"context"
-	"user-command-module/internal/application/command/add_user_address"
-	"user-command-module/internal/application/command/login_user"
-	"user-command-module/internal/application/command/register_user"
+	"user-command-module/internal/application/commands/add_user_address"
+	"user-command-module/internal/application/commands/login_user"
+	"user-command-module/internal/application/commands/register_user"
 
 	"connectrpc.com/connect"
 	"github.com/iamKienb/api-contract/gen/user"

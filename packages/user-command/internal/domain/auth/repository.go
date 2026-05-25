@@ -6,11 +6,11 @@ import (
 )
 
 type QueryRepository interface {
-	FindLoginStatByUserID(ctx context.Context, userID shared.UserID) (*LoginStat, error)
+	FindLoginAttemptByID(ctx context.Context, userID shared.UserID) (*LoginAttempt, error)
 }
 
 type CommandRepository interface {
-	SaveLoginStat(ctx context.Context, stat *LoginStat) error
+	SaveLoginAttempt(ctx context.Context, attempt *LoginAttempt) error
 }
 
 type Repository interface {
