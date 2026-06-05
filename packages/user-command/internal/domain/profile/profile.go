@@ -51,7 +51,6 @@ func NewProfile(params NewProfileParams) *Profile {
 
 func (p *Profile) FlushEvents() []shared.DomainEvent {
 	var domainEvents []shared.DomainEvent
-
 	domainEvents = append(domainEvents, p.EventEntity.Flush()...)
 	p.ClearEvent()
 

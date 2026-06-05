@@ -92,7 +92,7 @@
                     },
                     "country": {
                         "properties": {
-                            "country_id": {
+                            "id": {
                                 "type": "keyword"
                             },
                             "name": {
@@ -101,9 +101,9 @@
                             }
                         }
                     },
-                    "city": {
+                    "province": {
                         "properties": {
-                            "city_id": {
+                            "id": {
                                 "type": "keyword"
                             },
                             "name": {
@@ -114,7 +114,7 @@
                     },
                     "district": {
                         "properties": {
-                            "district_id": {
+                            "id": {
                                 "type": "keyword"
                             },
                             "name": {
@@ -125,7 +125,7 @@
                     },
                     "ward": {
                         "properties": {
-                            "ward_id": {
+                            "id": {
                                 "type": "keyword"
                             },
                             "name": {

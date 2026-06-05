@@ -9,14 +9,14 @@ import (
 func (r *userRepository) CreateUser(ctx context.Context, user *domain_user.User) error {
 	q := r.getQuerier(ctx)
 
-	if err := q.SaveUser(ctx, toInfraUser(user)); err != nil {
+	if err := q.CreateUser(ctx, toInfraUser(user)); err != nil {
 		if r.IsDuplicateEmail(err) {
 			return domain_user.ErrEmailTaken
 		}
 		return fmt.Errorf("infra: save user failed: %w", err)
 	}
 
-	if err := q.SaveUserCredential(ctx, toInfraCredential(&user.Credential)); err != nil {
+	if err := q.CreateUserCredential(ctx, toInfraCredential(&user.Credential)); err != nil {
 		return fmt.Errorf("infra: save credential failed: %w", err)
 	}
 

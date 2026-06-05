@@ -6,7 +6,7 @@ import (
 )
 
 type UserRegisteredEvent struct {
-	UserID    shared.UserID
+	UserID    string
 	Email     string
 	Status    StatusEnum
 	Roles     []RoleEnum
@@ -19,7 +19,7 @@ func (e UserRegisteredEvent) EventName() string {
 
 func (e UserRegisteredEvent) IntegrationPayload() map[string]interface{} {
 	return map[string]interface{}{
-		"user_id":    e.UserID.String(),
+		"user_id":    e.UserID,
 		"email":      e.Email,
 		"status":     string(e.Status),
 		"roles":      shared.Strings(e.Roles),
@@ -28,7 +28,7 @@ func (e UserRegisteredEvent) IntegrationPayload() map[string]interface{} {
 }
 
 type UserActivatedEvent struct {
-	UserID    shared.UserID
+	UserID    string
 	Status    StatusEnum
 	UpdatedAt *time.Time
 }
@@ -39,7 +39,7 @@ func (e UserActivatedEvent) EventName() string {
 
 func (e UserActivatedEvent) IntegrationPayload() map[string]interface{} {
 	return map[string]interface{}{
-		"user_id":    e.UserID.String(),
+		"user_id":    e.UserID,
 		"status":     e.Status,
 		"updated_at": e.UpdatedAt,
 	}

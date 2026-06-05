@@ -14,4 +14,9 @@ const (
 	MsgLabelInvalid       = "address label is invalid"
 	MsgInvalidCredentials = "email or password is incorrect"
 	MsgAccountLocked      = "your account is temporarily locked"
+
+	MsgAddressInvalid  = "address id is invalid or empty"
+	MsgAddressNotFound = "requested user address could not be found"
+
+	MsgAccessDenied = "your request is access denied"
 )

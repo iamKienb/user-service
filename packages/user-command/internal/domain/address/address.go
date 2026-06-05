@@ -16,10 +16,14 @@ type UserAddress struct {
 	ID     shared.UserAddressID
 	UserID shared.UserID
 
-	CountryID  int
-	CityID     int
-	DistrictID int
-	WardID     int
+	CountryID   string
+	CountryName string
+
+	ProvinceID   string
+	ProvinceName string
+
+	WardID   string
+	WardName string
 
 	AddressLine  string
 	ReceiverName string
@@ -41,10 +45,13 @@ func NewUserAddress(params NewUserAddressParams) *UserAddress {
 		ID:     userAddressID,
 		UserID: params.UserID,
 
-		CountryID:  params.CountryID,
-		CityID:     params.CityID,
-		DistrictID: params.DistrictID,
-		WardID:     params.WardID,
+		CountryID:   params.CountryID,
+		CountryName: params.CountryName,
+
+		ProvinceID:   params.ProvinceID,
+		ProvinceName: params.ProvinceName,
+		WardID:       params.WardID,
+		WardName:     params.WardName,
 
 		AddressLine:  params.AddressLine,
 		ReceiverName: params.ReceiverName,
@@ -60,14 +67,11 @@ func NewUserAddress(params NewUserAddressParams) *UserAddress {
 		UserAddressID: userAddressID,
 		UserID:        address.UserID,
 
-		CountryID:   params.CityID,
+		CountryID:   params.ProvinceID,
 		CountryName: params.CountryName,
 
-		CityID:   params.CityID,
-		CityName: params.CityName,
-
-		DistrictID:   params.DistrictID,
-		DistrictName: params.DistrictName,
+		ProvinceID:   params.ProvinceID,
+		ProvinceName: params.ProvinceName,
 
 		WardID:   params.WardID,
 		WardName: params.WardName,

@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"user-command-module/internal/application/commands/register_user"
@@ -41,34 +40,35 @@ func (s *userService) Register(ctx context.Context, cmd register_user.Command) (
 		Gender:   *validGender,
 	})
 
+	var outboxParams []port.OutboxParam
+
+	if userEvents := newUser.FlushEvents(); len(userEvents) > 0 {
+		outboxParams = append(outboxParams, port.OutboxParam{
+			AggregateID:   newUser.ID.RawID(),
+			AggregateType: newUser.Type(),
+			Events:        userEvents,
+		})
+	}
+
+	if profileEvents := newProfile.FlushEvents(); len(profileEvents) > 0 {
+		outboxParams = append(outboxParams, port.OutboxParam{
+			AggregateID:   newUser.ID.RawID(),
+			AggregateType: newProfile.Type(),
+			Events:        profileEvents,
+		})
+	}
+
 	if err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
 		if err := s.userRepo.CreateUser(ctx, newUser); err != nil {
 			return err
-		}
-
-		if userEvents := newUser.FlushEvents(); len(userEvents) > 0 {
-			if err := s.outboxService.Publish(ctx, port.OutboxParam{
-				AggregateID:   newUser.ID.RawID(),
-				AggregateType: newUser.Type(),
-				Events:        userEvents,
-			}); err != nil {
-				return err
-			}
 		}
 
 		if err := s.profileRepo.CreateProfile(ctx, newProfile); err != nil {
 			return err
 		}
 
-		if profileEvents := newProfile.FlushEvents(); len(profileEvents) > 0 {
-			if err := s.outboxService.Publish(ctx, port.OutboxParam{
-				AggregateID:   newUser.ID.RawID(),
-				AggregateType: newProfile.Type(),
-				Events:        profileEvents,
-			}); err != nil {
-				return err
-			}
-
+		if len(outboxParams) > 0 {
+			return s.outboxService.PublishBatch(ctx, outboxParams)
 		}
 
 		return nil
@@ -127,8 +127,6 @@ func (s *userService) createRegistrationChallenge(ctx context.Context, user *use
 	}, shared.SessionTTL); err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("[DEBUG] SESSION: %s, OTP: %s\n", sessionToken, otp)
 
 	return &register_user.Result{
 		SessionToken: sessionToken,

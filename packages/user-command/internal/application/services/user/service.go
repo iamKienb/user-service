@@ -6,21 +6,24 @@ import (
 	"user-command-module/internal/application/commands/login_user"
 	"user-command-module/internal/application/commands/register_user"
 	"user-command-module/internal/application/port"
+	get_user_address_by_id "user-command-module/internal/application/queries/get_address_by_id"
 	"user-command-module/internal/application/services/outbox"
 	"user-command-module/internal/domain/address"
 	"user-command-module/internal/domain/auth"
 	"user-command-module/internal/domain/profile"
-	"user-command-module/internal/domain/user"
+	"user-command-module/internal/domain/shared"
+	domain_user "user-command-module/internal/domain/user"
 )
 
 type Service interface {
 	Register(ctx context.Context, cmd register_user.Command) (*register_user.Result, error)
 	Login(ctx context.Context, cmd login_user.Command) (*login_user.Result, error)
 	AddAddress(ctx context.Context, cmd add_user_address.Command) (*add_user_address.Result, error)
+	GetAddress(ctx context.Context, qry get_user_address_by_id.Query) (*get_user_address_by_id.Result, error)
 }
 
 type userService struct {
-	userRepo        user.Repository
+	userRepo        domain_user.Repository
 	authRepo        auth.Repository
 	profileRepo     profile.Repository
 	userAddressRepo address.Repository
@@ -36,7 +39,7 @@ type userService struct {
 }
 
 func NewUserService(
-	userRepo user.Repository,
+	userRepo domain_user.Repository,
 	authRepo auth.Repository,
 	profileRepo profile.Repository,
 	userAddressRepo address.Repository,
@@ -65,4 +68,18 @@ func NewUserService(
 		txManager: txManager,
 		hasher:    hasher,
 	}
+}
+
+func (s *userService) validateAndCheckActiveUser(ctx context.Context, userID shared.UserID) (*domain_user.User, error) {
+	user, err := s.userRepo.FindUserByID(ctx, userID)
+	if err != nil {
+		return nil, s.wrapError(err)
+	}
+	if user == nil {
+		return nil, s.wrapError(domain_user.ErrUserNotFound)
+	}
+	if err := user.EnsureActive(); err != nil {
+		return nil, s.wrapError(err)
+	}
+	return user, nil
 }

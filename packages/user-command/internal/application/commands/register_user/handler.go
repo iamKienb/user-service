@@ -1,8 +1,6 @@
 package register_user
 
-import (
-	"context"
-)
+import "context"
 
 type userService interface {
 	Register(ctx context.Context, cmd Command) (*Result, error)

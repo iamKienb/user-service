@@ -11,14 +11,16 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const saveUserAddress = `-- name: SaveUserAddress :exec
+const createUserAddress = `-- name: CreateUserAddress :exec
 INSERT INTO user_addresses (
     id,
     user_id, 
-    country_id, 
-    city_id, 
-    district_id, 
+    country_id,
+    country_name,
+    province_id,
+    province_name,
     ward_id, 
+    ward_name,
     address_line, 
     receiver_name, 
     phone_number, 
@@ -27,33 +29,53 @@ INSERT INTO user_addresses (
     created_at, 
     updated_at
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+VALUES (
+    $1::uuid,
+    $2::uuid,
+    $3::text,
+    $4::text,
+    $5::text,
+    $6::text,
+    $7::text,
+    $8::text,
+    $9::text,
+    $10::text,
+    $11::text,
+    $12::text,
+    $13::boolean,
+    $14::timestamptz,
+    $15::updated_at
+)
 `
 
-type SaveUserAddressParams struct {
+type CreateUserAddressParams struct {
 	ID           pgtype.UUID
 	UserID       pgtype.UUID
-	CountryID    int32
-	CityID       int32
-	DistrictID   int32
-	WardID       int32
+	CountryID    string
+	CountryName  string
+	ProvinceID   string
+	ProvinceName string
+	WardID       string
+	WardName     string
 	AddressLine  string
 	ReceiverName string
 	PhoneNumber  string
 	Label        string
 	IsDefault    bool
 	CreatedAt    pgtype.Timestamptz
-	UpdatedAt    pgtype.Timestamptz
+	UpdatedAt    interface{}
 }
 
-func (q *Queries) SaveUserAddress(ctx context.Context, arg SaveUserAddressParams) error {
-	_, err := q.db.Exec(ctx, saveUserAddress,
+func (q *Queries) CreateUserAddress(ctx context.Context, arg CreateUserAddressParams) error {
+	_, err := q.db.Exec(ctx, createUserAddress,
 		arg.ID,
 		arg.UserID,
 		arg.CountryID,
-		arg.CityID,
-		arg.DistrictID,
+		arg.CountryName,
+		arg.ProvinceID,
+		arg.ProvinceName,
 		arg.WardID,
+		arg.WardName,
 		arg.AddressLine,
 		arg.ReceiverName,
 		arg.PhoneNumber,
@@ -63,4 +85,33 @@ func (q *Queries) SaveUserAddress(ctx context.Context, arg SaveUserAddressParams
 		arg.UpdatedAt,
 	)
 	return err
+}
+
+const findUserAddressByID = `-- name: FindUserAddressByID :one
+SELECT id, user_id, country_id, country_name, province_id, province_name, ward_id, ward_name, address_line, receiver_name, phone_number, label, is_default, created_at, updated_at
+FROM user_addresses
+WHERE id = $1::uuid LIMIT 1
+`
+
+func (q *Queries) FindUserAddressByID(ctx context.Context, addressID pgtype.UUID) (UserAddress, error) {
+	row := q.db.QueryRow(ctx, findUserAddressByID, addressID)
+	var i UserAddress
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.CountryID,
+		&i.CountryName,
+		&i.ProvinceID,
+		&i.ProvinceName,
+		&i.WardID,
+		&i.WardName,
+		&i.AddressLine,
+		&i.ReceiverName,
+		&i.PhoneNumber,
+		&i.Label,
+		&i.IsDefault,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

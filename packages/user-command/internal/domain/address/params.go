@@ -7,16 +7,13 @@ import (
 type NewUserAddressParams struct {
 	UserID shared.UserID
 
-	CountryID   int
+	CountryID   string
 	CountryName string
 
-	CityID   int
-	CityName string
+	ProvinceID   string
+	ProvinceName string
 
-	DistrictID   int
-	DistrictName string
-
-	WardID   int
+	WardID   string
 	WardName string
 
 	AddressLine  string

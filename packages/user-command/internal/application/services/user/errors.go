@@ -23,10 +23,12 @@ var userErrorMap = app_error.ServiceErrorMap{
 	profile.ErrNameTooLong:   {Kind: app_error.KindValidation, Msg: i18n.MsgNameTooLong},
 	profile.ErrGenderInvalid: {Kind: app_error.KindValidation, Msg: i18n.MsgGenderInvalid},
 
-	address.ErrLabelInvalid: {Kind: app_error.KindValidation, Msg: i18n.MsgLabelInvalid},
+	address.ErrLabelInvalid:    {Kind: app_error.KindValidation, Msg: i18n.MsgLabelInvalid},
+	address.ErrAddressNotFound: {Kind: app_error.KindNotFound, Msg: i18n.MsgAddressNotFound},
 
 	auth.ErrInvalidCredentials: {Kind: app_error.KindUnauthorized, Msg: i18n.MsgInvalidCredentials},
 	auth.ErrAccountLocked:      {Kind: app_error.KindForbidden, Msg: i18n.MsgAccountLocked},
+	auth.ErrAccessDenied:       {Kind: app_error.KindUnauthorized, Msg: i18n.MsgAccessDenied},
 }
 
 func (s *userService) wrapError(err error) error {

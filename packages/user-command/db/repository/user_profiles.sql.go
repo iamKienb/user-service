@@ -11,29 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getUserProfileByID = `-- name: GetUserProfileByID :one
-SELECT user_id, full_name, gender, phone_number, avatar_url, date_of_birth, created_at, updated_at
-FROM user_profiles
-WHERE user_id = $1
-`
-
-func (q *Queries) GetUserProfileByID(ctx context.Context, userID pgtype.UUID) (UserProfile, error) {
-	row := q.db.QueryRow(ctx, getUserProfileByID, userID)
-	var i UserProfile
-	err := row.Scan(
-		&i.UserID,
-		&i.FullName,
-		&i.Gender,
-		&i.PhoneNumber,
-		&i.AvatarUrl,
-		&i.DateOfBirth,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const saveUserProfile = `-- name: SaveUserProfile :exec
+const createUserProfile = `-- name: CreateUserProfile :exec
 INSERT INTO user_profiles (
     user_id,
     full_name,
@@ -47,7 +25,7 @@ INSERT INTO user_profiles (
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 `
 
-type SaveUserProfileParams struct {
+type CreateUserProfileParams struct {
 	UserID      pgtype.UUID
 	FullName    string
 	Gender      string
@@ -58,8 +36,8 @@ type SaveUserProfileParams struct {
 	UpdatedAt   pgtype.Timestamptz
 }
 
-func (q *Queries) SaveUserProfile(ctx context.Context, arg SaveUserProfileParams) error {
-	_, err := q.db.Exec(ctx, saveUserProfile,
+func (q *Queries) CreateUserProfile(ctx context.Context, arg CreateUserProfileParams) error {
+	_, err := q.db.Exec(ctx, createUserProfile,
 		arg.UserID,
 		arg.FullName,
 		arg.Gender,
@@ -70,4 +48,26 @@ func (q *Queries) SaveUserProfile(ctx context.Context, arg SaveUserProfileParams
 		arg.UpdatedAt,
 	)
 	return err
+}
+
+const findUserProfileByID = `-- name: FindUserProfileByID :one
+SELECT user_id, full_name, gender, phone_number, avatar_url, date_of_birth, created_at, updated_at
+FROM user_profiles
+WHERE user_id = $1
+`
+
+func (q *Queries) FindUserProfileByID(ctx context.Context, userID pgtype.UUID) (UserProfile, error) {
+	row := q.db.QueryRow(ctx, findUserProfileByID, userID)
+	var i UserProfile
+	err := row.Scan(
+		&i.UserID,
+		&i.FullName,
+		&i.Gender,
+		&i.PhoneNumber,
+		&i.AvatarUrl,
+		&i.DateOfBirth,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	Publish(ctx context.Context, param port.OutboxParam) error
+	PublishBatch(ctx context.Context, params []port.OutboxParam) error
 }
 
 type outboxService struct {

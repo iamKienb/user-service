@@ -2,10 +2,12 @@
 INSERT INTO user_addresses (
     id,
     user_id, 
-    country_id, 
-    city_id, 
-    district_id, 
+    country_id,
+    country_name,
+    province_id,
+    province_name,
     ward_id, 
+    ward_name,
     address_line, 
     receiver_name, 
     phone_number, 
@@ -14,4 +16,25 @@ INSERT INTO user_addresses (
     created_at, 
     updated_at
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);
+VALUES (
+    @id::uuid,
+    @user_id::uuid,
+    @country_id::text,
+    @country_name::text,
+    @province_id::text,
+    @province_name::text,
+    @ward_id::text,
+    @ward_name::text,
+    @address_line::text,
+    @receiver_name::text,
+    @phone_number::text,
+    @label::text,
+    @is_default::boolean,
+    @created_at::timestamptz,
+    @updated_at::updated_at
+);
+
+-- name: FindUserAddressByID :one
+SELECT *
+FROM user_addresses
+WHERE id = @address_id::uuid LIMIT 1;

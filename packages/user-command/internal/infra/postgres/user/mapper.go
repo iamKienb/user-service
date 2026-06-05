@@ -9,8 +9,8 @@ import (
 	"github.com/iamKienb/go-core/postgres/conv"
 )
 
-func toInfraUser(u *domain_user.User) repository.SaveUserParams {
-	return repository.SaveUserParams{
+func toInfraUser(u *domain_user.User) repository.CreateUserParams {
+	return repository.CreateUserParams{
 		ID:              conv.UUID(u.ID),
 		Email:           u.Email,
 		EmailVerifiedAt: conv.TimeStampZ(u.EmailVerifiedAt),
@@ -22,25 +22,33 @@ func toInfraUser(u *domain_user.User) repository.SaveUserParams {
 	}
 }
 
-func toDomainUser(row repository.User) *domain_user.User {
+func toDomainUser(userRow repository.User, credentialRow *repository.UserCredential) *domain_user.User {
 	var emailVerifiedAt *time.Time
-	if row.EmailVerifiedAt.Valid {
-		emailVerifiedAt = &row.EmailVerifiedAt.Time
+	if userRow.EmailVerifiedAt.Valid {
+		emailVerifiedAt = &userRow.EmailVerifiedAt.Time
 	}
 
 	var deletedAt *time.Time
-	if row.DeletedAt.Valid {
-		deletedAt = &row.DeletedAt.Time
+	if userRow.DeletedAt.Valid {
+		deletedAt = &userRow.DeletedAt.Time
+	}
+
+	credential := domain_user.UserCredential{
+		UserID:            credentialRow.UserID.Bytes,
+		PasswordHash:      credentialRow.PasswordHash,
+		PasswordVersion:   int(credentialRow.PasswordVersion),
+		PasswordUpdatedAt: credentialRow.PasswordUpdatedAt.Time,
 	}
 
 	return &domain_user.User{
-		ID:              shared.UserID(row.ID.Bytes),
-		Email:           row.Email,
-		Status:          domain_user.StatusEnum(row.Status),
+		ID:              shared.UserID(userRow.ID.Bytes),
+		Email:           userRow.Email,
+		Status:          domain_user.StatusEnum(userRow.Status),
 		EmailVerifiedAt: emailVerifiedAt,
-		Roles:           shared.FromStrings[domain_user.RoleEnum](row.Roles),
-		CreatedAt:       row.CreatedAt.Time,
-		UpdatedAt:       &row.UpdatedAt.Time,
+		Roles:           shared.FromStrings[domain_user.RoleEnum](userRow.Roles),
+		Credential:      credential,
+		CreatedAt:       userRow.CreatedAt.Time,
+		UpdatedAt:       &userRow.UpdatedAt.Time,
 		DeletedAt:       deletedAt,
 	}
 }
@@ -67,8 +75,8 @@ func toDomainCredential(row repository.UserCredential) *domain_user.UserCredenti
 	}
 }
 
-func toInfraCredential(c *domain_user.UserCredential) repository.SaveUserCredentialParams {
-	return repository.SaveUserCredentialParams{
+func toInfraCredential(c *domain_user.UserCredential) repository.CreateUserCredentialParams {
+	return repository.CreateUserCredentialParams{
 		UserID:            conv.UUID(c.UserID),
 		PasswordHash:      c.PasswordHash,
 		PasswordVersion:   int32(c.PasswordVersion),

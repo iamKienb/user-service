@@ -6,7 +6,7 @@ import (
 )
 
 type QueryRepository interface {
-	FindUserAddressByID(ctx context.Context, addressID shared.UserAddressID) (*UserAddress, error)
+	FindAddressByID(ctx context.Context, userAddressID shared.UserAddressID) (*UserAddress, error)
 }
 
 type CommandRepository interface {
@@ -14,6 +14,6 @@ type CommandRepository interface {
 }
 
 type Repository interface {
-	// QueryRepository
+	QueryRepository
 	CommandRepository
 }

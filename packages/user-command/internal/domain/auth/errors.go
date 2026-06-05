@@ -11,4 +11,6 @@ var (
 	ErrSessionInvalid = errors.New("session_invalid")
 	ErrOTPMaxRetry    = errors.New("otp_max_retry_reached")
 	ErrResendLimit    = errors.New("otp_resend_limit_reached")
+
+	ErrAccessDenied = errors.New("access_denied")
 )

@@ -7,7 +7,7 @@ import (
 )
 
 func (r *loginRepository) SaveLoginAttempt(ctx context.Context, stat *auth.LoginAttempt) error {
-	if err := r.getQuerier(ctx).SaveLoginStats(ctx, toInfraLoginAttempt(stat)); err != nil {
+	if err := r.getQuerier(ctx).SaveLoginAttempt(ctx, toInfraLoginAttempt(stat)); err != nil {
 		return fmt.Errorf("infra: save login stats: %w", err)
 	}
 

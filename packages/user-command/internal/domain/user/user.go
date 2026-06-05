@@ -61,7 +61,7 @@ func NewUser(params NewUserParams) *User {
 	}
 
 	user.AddEvent(UserRegisteredEvent{
-		UserID:    userID,
+		UserID:    userID.String(),
 		Email:     user.Email,
 		Status:    user.Status,
 		Roles:     user.Roles,
@@ -83,7 +83,7 @@ func (u *User) IsActive() bool {
 	return u.Status == StatusActive
 }
 
-func (u *User) EnsureActiveForLogin() error {
+func (u *User) EnsureActive() error {
 	if !u.IsActive() {
 		return ErrUserNotActive
 	}
@@ -105,7 +105,7 @@ func (u *User) ActivateIfVerified() bool {
 	}
 
 	u.EventEntity.AddEvent(UserActivatedEvent{
-		UserID:    u.ID,
+		UserID:    u.ID.String(),
 		Status:    u.Status,
 		UpdatedAt: u.UpdatedAt,
 	})

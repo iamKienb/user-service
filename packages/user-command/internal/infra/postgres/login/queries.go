@@ -12,7 +12,7 @@ import (
 )
 
 func (r *loginRepository) FindLoginAttemptByID(ctx context.Context, userID shared.UserID) (*auth.LoginAttempt, error) {
-	statsRow, err := r.getQuerier(ctx).GetLoginStatsByID(ctx, conv.UUID(userID))
+	statsRow, err := r.getQuerier(ctx).FindLoginAttemptsByID(ctx, conv.UUID(userID))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

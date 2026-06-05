@@ -9,16 +9,13 @@ type UserAddressAddedEvent struct {
 	UserID        shared.UserID
 	UserAddressID shared.UserAddressID
 
-	CountryID   int
+	CountryID   string
 	CountryName string
 
-	CityID   int
-	CityName string
+	ProvinceID   string
+	ProvinceName string
 
-	DistrictID   int
-	DistrictName string
-
-	WardID   int
+	WardID   string
 	WardName string
 
 	AddressLine  string
@@ -40,10 +37,8 @@ func (e UserAddressAddedEvent) IntegrationPayload() map[string]interface{} {
 		"user_address_id": e.UserAddressID.String(),
 		"country_id":      e.CountryID,
 		"country_name":    e.CountryName,
-		"city_id":         e.CityID,
-		"city_name":       e.CityName,
-		"district_id":     e.DistrictID,
-		"district_name":   e.DistrictName,
+		"province_id":     e.ProvinceID,
+		"province_name":   e.ProvinceName,
 		"ward_id":         e.WardID,
 		"ward_name":       e.WardName,
 		"address_line":    e.AddressLine,

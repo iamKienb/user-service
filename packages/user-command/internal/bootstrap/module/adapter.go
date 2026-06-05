@@ -50,6 +50,7 @@ func NewAdapterModule(app *ApplicationModule, logger *slog.Logger) *AdapterModul
 		app.RegisterExecutor,
 		app.LoginExecutor,
 		app.AddUserAddressExecutor,
+		app.GetUserAddressExecutor,
 	)
 
 	otpServer := otp.NewOTPServer(

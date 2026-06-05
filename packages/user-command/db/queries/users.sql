@@ -9,7 +9,16 @@ INSERT INTO users (
     updated_at,
     deleted_at
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+VALUES (
+    @id::uuid,
+    @email::text,
+    @email_verified_at::timestamptz,
+    @status::text,
+    @roles::text[],
+    @created_at::timestamptz,
+    @updated_at::timestamptz,
+    @deleted_at::timestamptz
+);
 
 -- name: FindUserByID :one
 SELECT * 

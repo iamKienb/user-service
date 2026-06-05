@@ -8,27 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type City struct {
-	ID        int32
-	CountryID pgtype.Int4
-	Name      string
-	Type      pgtype.Text
-}
-
-type Country struct {
-	ID   int32
-	Name string
-	Code pgtype.Text
-}
-
-type District struct {
-	ID     int32
-	CityID pgtype.Int4
-	Name   string
-	Type   pgtype.Text
-}
-
-type LoginStat struct {
+type LoginAttempt struct {
 	UserID       pgtype.UUID
 	FailedCount  int32
 	LockUntil    pgtype.Timestamptz
@@ -47,67 +27,6 @@ type Outbox struct {
 	CreatedAt      pgtype.Timestamptz
 }
 
-type Shop struct {
-	ID        pgtype.UUID
-	OwnerID   pgtype.UUID
-	Name      string
-	Slug      string
-	Status    string
-	CreatedBy pgtype.UUID
-	UpdatedBy pgtype.UUID
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
-	DeletedAt pgtype.Timestamptz
-}
-
-type ShopAddress struct {
-	ID          pgtype.UUID
-	ShopID      pgtype.UUID
-	CountryID   int32
-	CityID      int32
-	DistrictID  int32
-	WardID      int32
-	AddressLine string
-	ContactName string
-	PhoneNumber string
-	Type        string
-	CreatedBy   pgtype.UUID
-	UpdatedBy   pgtype.UUID
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
-}
-
-type ShopMember struct {
-	ShopID   pgtype.UUID
-	MemberID pgtype.UUID
-	JoinedAt pgtype.Timestamptz
-	AddedBy  pgtype.UUID
-}
-
-type ShopMemberRole struct {
-	ShopID    pgtype.UUID
-	MemberID  pgtype.UUID
-	RoleID    int32
-	UpdatedBy pgtype.UUID
-}
-
-type ShopProfile struct {
-	ShopID      pgtype.UUID
-	Description pgtype.Text
-	LogoUrl     pgtype.Text
-	BannerUrl   pgtype.Text
-	CreatedBy   pgtype.UUID
-	UpdatedBy   pgtype.UUID
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
-}
-
-type ShopRole struct {
-	ID   int32
-	Code string
-	Name string
-}
-
 type User struct {
 	ID              pgtype.UUID
 	Email           string
@@ -122,10 +41,12 @@ type User struct {
 type UserAddress struct {
 	ID           pgtype.UUID
 	UserID       pgtype.UUID
-	CountryID    int32
-	CityID       int32
-	DistrictID   int32
-	WardID       int32
+	CountryID    string
+	CountryName  string
+	ProvinceID   string
+	ProvinceName string
+	WardID       string
+	WardName     string
 	AddressLine  string
 	ReceiverName string
 	PhoneNumber  string
@@ -151,11 +72,4 @@ type UserProfile struct {
 	DateOfBirth pgtype.Date
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
-}
-
-type Ward struct {
-	ID         int32
-	DistrictID pgtype.Int4
-	Name       string
-	Type       pgtype.Text
 }

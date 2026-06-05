@@ -7,7 +7,7 @@ import (
 )
 
 func (r *profileRepository) CreateProfile(ctx context.Context, profile *domain_profile.Profile) error {
-	if err := r.getQuerier(ctx).SaveUserProfile(ctx, toInfraProfile(profile)); err != nil {
+	if err := r.getQuerier(ctx).CreateUserProfile(ctx, toInfraProfile(profile)); err != nil {
 		return fmt.Errorf("infra: save profile failed: %w", err)
 	}
 

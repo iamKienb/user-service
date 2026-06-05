@@ -8,7 +8,7 @@ import (
 )
 
 func (s *userService) AddAddress(ctx context.Context, cmd add_user_address.Command) (*add_user_address.Result, error) {
-	_, err := s.userRepo.FindUserByID(ctx, cmd.UserID)
+	_, err := s.validateAndCheckActiveUser(ctx, cmd.UserID)
 	if err != nil {
 		return nil, s.wrapError(err)
 	}
@@ -22,10 +22,8 @@ func (s *userService) AddAddress(ctx context.Context, cmd add_user_address.Comma
 		UserID:       cmd.UserID,
 		CountryID:    cmd.Country.ID,
 		CountryName:  cmd.Country.Name,
-		CityID:       cmd.City.ID,
-		CityName:     cmd.City.Name,
-		DistrictID:   cmd.District.ID,
-		DistrictName: cmd.District.Name,
+		ProvinceID:   cmd.Province.ID,
+		ProvinceName: cmd.Province.Name,
 		WardID:       cmd.Ward.ID,
 		WardName:     cmd.Ward.Name,
 		AddressLine:  cmd.AddressLine,
@@ -40,6 +38,6 @@ func (s *userService) AddAddress(ctx context.Context, cmd add_user_address.Comma
 	}
 
 	return &add_user_address.Result{
-		UserAddressID: newAddress.ID.String(),
+		UserAddressID: newAddress.ID,
 	}, nil
 }

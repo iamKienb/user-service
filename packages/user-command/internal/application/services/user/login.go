@@ -63,7 +63,7 @@ func (s *userService) verifyLoginPolicy(ctx context.Context, user *user.User, pa
 		return auth.ErrInvalidCredentials
 	}
 
-	if err := user.EnsureActiveForLogin(); err != nil {
+	if err := user.EnsureActive(); err != nil {
 		return err
 	}
 

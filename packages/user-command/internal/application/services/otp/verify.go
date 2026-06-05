@@ -88,20 +88,23 @@ func (s *otpService) activateUserIfNeeded(ctx context.Context, userID string) (*
 		return nil, user.ErrUserNotFound
 	}
 
+	var outboxParams []port.OutboxParam
+	if events := u.FlushEvents(); len(events) > 0 {
+		outboxParams = append(outboxParams, port.OutboxParam{
+			AggregateID:   u.ID.RawID(),
+			AggregateType: u.Type(),
+			Events:        events,
+		})
+	}
+
 	if u.ActivateIfVerified() {
 		err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
 			if err := s.userRepo.UpdateUser(ctx, u); err != nil {
 				return err
 			}
 
-			if events := u.FlushEvents(); len(events) > 0 {
-				if err := s.outboxService.Publish(ctx, port.OutboxParam{
-					AggregateID:   u.ID.RawID(),
-					AggregateType: u.Type(),
-					Events:        events,
-				}); err != nil {
-					return err
-				}
+			if len(outboxParams) > 0 {
+				return s.outboxService.PublishBatch(ctx, outboxParams)
 			}
 
 			return nil

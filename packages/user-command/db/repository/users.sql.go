@@ -11,51 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, email_verified_at, status, roles, created_at, updated_at, deleted_at 
-FROM users
-WHERE email = $1
-`
-
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.EmailVerifiedAt,
-		&i.Status,
-		&i.Roles,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return i, err
-}
-
-const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, email_verified_at, status, roles, created_at, updated_at, deleted_at 
-FROM users
-WHERE id = $1
-`
-
-func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByID, id)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.EmailVerifiedAt,
-		&i.Status,
-		&i.Roles,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return i, err
-}
-
-const saveUser = `-- name: SaveUser :exec
+const createUser = `-- name: CreateUser :exec
 INSERT INTO users (
     id,
     email,
@@ -66,10 +22,19 @@ INSERT INTO users (
     updated_at,
     deleted_at
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+VALUES (
+    $1::uuid,
+    $2::text,
+    $3::timestamptz,
+    $4::text,
+    $5::text[],
+    $6::timestamptz,
+    $7::timestamptz,
+    $8::timestamptz
+)
 `
 
-type SaveUserParams struct {
+type CreateUserParams struct {
 	ID              pgtype.UUID
 	Email           string
 	EmailVerifiedAt pgtype.Timestamptz
@@ -80,8 +45,8 @@ type SaveUserParams struct {
 	DeletedAt       pgtype.Timestamptz
 }
 
-func (q *Queries) SaveUser(ctx context.Context, arg SaveUserParams) error {
-	_, err := q.db.Exec(ctx, saveUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.Exec(ctx, createUser,
 		arg.ID,
 		arg.Email,
 		arg.EmailVerifiedAt,
@@ -92,6 +57,50 @@ func (q *Queries) SaveUser(ctx context.Context, arg SaveUserParams) error {
 		arg.DeletedAt,
 	)
 	return err
+}
+
+const findUserByEmail = `-- name: FindUserByEmail :one
+SELECT id, email, email_verified_at, status, roles, created_at, updated_at, deleted_at 
+FROM users
+WHERE email = $1
+`
+
+func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, findUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.EmailVerifiedAt,
+		&i.Status,
+		&i.Roles,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const findUserByID = `-- name: FindUserByID :one
+SELECT id, email, email_verified_at, status, roles, created_at, updated_at, deleted_at 
+FROM users
+WHERE id = $1
+`
+
+func (q *Queries) FindUserByID(ctx context.Context, id pgtype.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, findUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.EmailVerifiedAt,
+		&i.Status,
+		&i.Roles,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
 }
 
 const updateUser = `-- name: UpdateUser :exec

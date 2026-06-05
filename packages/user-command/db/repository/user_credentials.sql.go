@@ -11,25 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getUserCredentialByID = `-- name: GetUserCredentialByID :one
-SELECT user_id, password_hash, password_version, password_updated_at
-FROM user_credentials
-WHERE user_id = $1
-`
-
-func (q *Queries) GetUserCredentialByID(ctx context.Context, userID pgtype.UUID) (UserCredential, error) {
-	row := q.db.QueryRow(ctx, getUserCredentialByID, userID)
-	var i UserCredential
-	err := row.Scan(
-		&i.UserID,
-		&i.PasswordHash,
-		&i.PasswordVersion,
-		&i.PasswordUpdatedAt,
-	)
-	return i, err
-}
-
-const saveUserCredential = `-- name: SaveUserCredential :exec
+const createUserCredential = `-- name: CreateUserCredential :exec
 INSERT INTO user_credentials (
     user_id,
     password_hash,
@@ -39,19 +21,37 @@ INSERT INTO user_credentials (
 VALUES ($1, $2, $3, $4)
 `
 
-type SaveUserCredentialParams struct {
+type CreateUserCredentialParams struct {
 	UserID            pgtype.UUID
 	PasswordHash      string
 	PasswordVersion   int32
 	PasswordUpdatedAt pgtype.Timestamptz
 }
 
-func (q *Queries) SaveUserCredential(ctx context.Context, arg SaveUserCredentialParams) error {
-	_, err := q.db.Exec(ctx, saveUserCredential,
+func (q *Queries) CreateUserCredential(ctx context.Context, arg CreateUserCredentialParams) error {
+	_, err := q.db.Exec(ctx, createUserCredential,
 		arg.UserID,
 		arg.PasswordHash,
 		arg.PasswordVersion,
 		arg.PasswordUpdatedAt,
 	)
 	return err
+}
+
+const findUserCredentialByID = `-- name: FindUserCredentialByID :one
+SELECT user_id, password_hash, password_version, password_updated_at
+FROM user_credentials
+WHERE user_id = $1
+`
+
+func (q *Queries) FindUserCredentialByID(ctx context.Context, userID pgtype.UUID) (UserCredential, error) {
+	row := q.db.QueryRow(ctx, findUserCredentialByID, userID)
+	var i UserCredential
+	err := row.Scan(
+		&i.UserID,
+		&i.PasswordHash,
+		&i.PasswordVersion,
+		&i.PasswordUpdatedAt,
+	)
+	return i, err
 }

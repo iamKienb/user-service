@@ -38,8 +38,8 @@ func toDomainProfile(row repository.UserProfile) *domain_profile.Profile {
 	}
 }
 
-func toInfraProfile(p *domain_profile.Profile) repository.SaveUserProfileParams {
-	return repository.SaveUserProfileParams{
+func toInfraProfile(p *domain_profile.Profile) repository.CreateUserProfileParams {
+	return repository.CreateUserProfileParams{
 		UserID:      conv.UUID(p.UserID),
 		FullName:    p.FullName,
 		Gender:      string(p.Gender),

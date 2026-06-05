@@ -4,8 +4,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type AddressID int
-
 type UserID uuid.UUID
 type UserAddressID uuid.UUID
 

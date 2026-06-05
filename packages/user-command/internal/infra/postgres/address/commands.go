@@ -7,7 +7,7 @@ import (
 )
 
 func (r *userAddressRepository) CreateUserAddress(ctx context.Context, addr *domain_address.UserAddress) error {
-	if err := r.getQuerier(ctx).SaveUserAddress(ctx, toInfraUserAddress(addr)); err != nil {
+	if err := r.getQuerier(ctx).CreateUserAddress(ctx, toInfraUserAddress(addr)); err != nil {
 		return fmt.Errorf("infra: save user address failed: %w", err)
 	}
 

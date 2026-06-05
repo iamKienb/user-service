@@ -9,7 +9,7 @@ import (
 	"github.com/iamKienb/go-core/postgres/conv"
 )
 
-func toDomainLoginAttempt(row repository.LoginStat) *auth.LoginAttempt {
+func toDomainLoginAttempt(row repository.LoginAttempt) *auth.LoginAttempt {
 	var lockUntil *time.Time
 	if row.LockUntil.Valid {
 		lockUntil = &row.LockUntil.Time
@@ -29,8 +29,8 @@ func toDomainLoginAttempt(row repository.LoginStat) *auth.LoginAttempt {
 	}
 }
 
-func toInfraLoginAttempt(s *auth.LoginAttempt) repository.SaveLoginStatsParams {
-	return repository.SaveLoginStatsParams{
+func toInfraLoginAttempt(s *auth.LoginAttempt) repository.SaveLoginAttemptParams {
+	return repository.SaveLoginAttemptParams{
 		UserID:       conv.UUID(s.UserID),
 		FailedCount:  int32(s.FailedCount),
 		LockUntil:    conv.TimeStampZ(s.LockUntil),

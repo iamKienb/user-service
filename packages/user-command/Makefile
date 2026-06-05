@@ -1,4 +1,4 @@
-DB_URL=postgres://postgres:postgress@127.0.0.1:5433/shopify_users_service?sslmode=disable
+DB_URL=postgres://postgres:postgres@127.0.0.1:5433/shopify_user_service?sslmode=disable
 sqlc:
 	sqlc generate
 

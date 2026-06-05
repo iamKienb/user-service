@@ -2,10 +2,14 @@ CREATE TABLE user_addresses (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     
-    country_id INT NOT NULL REFERENCES countries(id),
-    city_id INT NOT NULL REFERENCES cities(id),
-    district_id INT NOT NULL REFERENCES districts(id),
-    ward_id INT NOT NULL REFERENCES wards(id),
+    country_id TEXT NOT NULL,
+    country_name TEXT NOT NULL,
+
+    province_id TEXT NOT NULL,
+    province_name TEXT NOT NULL,
+    
+    ward_id TEXT NOT NULL,
+    ward_name TEXT NOT NULL,
 
     address_line TEXT NOT NULL,
     receiver_name TEXT NOT NULL,
@@ -22,6 +26,5 @@ CREATE TABLE user_addresses (
 
 CREATE INDEX idx_user_addresses_user_id ON user_addresses(user_id);
 CREATE INDEX idx_user_addresses_country_id ON user_addresses(country_id);
-CREATE INDEX idx_user_addresses_city_id ON user_addresses(city_id);
-CREATE INDEX idx_user_addresses_district_id ON user_addresses(district_id);
+CREATE INDEX idx_user_addresses_province_id ON user_addresses(province_id);
 CREATE INDEX idx_user_addresses_ward_id ON user_addresses(ward_id);

@@ -22,7 +22,7 @@ func (h *UserAddressAddedHandler) Handle(ctx context.Context, raw json.RawMessag
 		return err
 	}
 
-	fullAddress := payload.AddressLine + payload.WardName + payload.DistrictName + payload.CityName
+	fullAddress := payload.AddressLine + payload.WardName + payload.ProvinceName
 
 	doc := map[string]any{
 		"address": map[string]any{
@@ -34,17 +34,13 @@ func (h *UserAddressAddedHandler) Handle(ctx context.Context, raw json.RawMessag
 				"country_id": payload.CountryID,
 				"name":       payload.CountryName,
 			},
-			"city": map[string]any{
-				"city_id": payload.CityID,
-				"name":    payload.CityName,
-			},
-			"district": map[string]any{
-				"district_id": payload.DistrictID,
-				"name":        payload.DistrictName,
+			"province": map[string]any{
+				"id":   payload.ProvinceID,
+				"name": payload.ProvinceName,
 			},
 			"ward": map[string]any{
-				"ward_id": payload.WardID,
-				"name":    payload.WardName,
+				"id":   payload.WardID,
+				"name": payload.WardName,
 			},
 
 			"address_line":  payload.AddressLine,

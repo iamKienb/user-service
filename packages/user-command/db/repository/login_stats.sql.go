@@ -11,15 +11,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getLoginStatsByID = `-- name: GetLoginStatsByID :one
+const findLoginAttemptsByID = `-- name: FindLoginAttemptsByID :one
 SELECT user_id, failed_count, lock_until, last_failed_at, updated_at
-FROM login_stats
+FROM login_attempts
 WHERE user_id = $1
 `
 
-func (q *Queries) GetLoginStatsByID(ctx context.Context, userID pgtype.UUID) (LoginStat, error) {
-	row := q.db.QueryRow(ctx, getLoginStatsByID, userID)
-	var i LoginStat
+func (q *Queries) FindLoginAttemptsByID(ctx context.Context, userID pgtype.UUID) (LoginAttempt, error) {
+	row := q.db.QueryRow(ctx, findLoginAttemptsByID, userID)
+	var i LoginAttempt
 	err := row.Scan(
 		&i.UserID,
 		&i.FailedCount,
@@ -30,8 +30,8 @@ func (q *Queries) GetLoginStatsByID(ctx context.Context, userID pgtype.UUID) (Lo
 	return i, err
 }
 
-const saveLoginStats = `-- name: SaveLoginStats :exec
-INSERT INTO login_stats (
+const saveLoginAttempt = `-- name: SaveLoginAttempt :exec
+INSERT INTO login_attempts (
     user_id,
     failed_count,
     lock_until,
@@ -46,7 +46,7 @@ ON CONFLICT (user_id) DO UPDATE SET
     updated_at = EXCLUDED.updated_at
 `
 
-type SaveLoginStatsParams struct {
+type SaveLoginAttemptParams struct {
 	UserID       pgtype.UUID
 	FailedCount  int32
 	LockUntil    pgtype.Timestamptz
@@ -54,8 +54,8 @@ type SaveLoginStatsParams struct {
 	UpdatedAt    pgtype.Timestamptz
 }
 
-func (q *Queries) SaveLoginStats(ctx context.Context, arg SaveLoginStatsParams) error {
-	_, err := q.db.Exec(ctx, saveLoginStats,
+func (q *Queries) SaveLoginAttempt(ctx context.Context, arg SaveLoginAttemptParams) error {
+	_, err := q.db.Exec(ctx, saveLoginAttempt,
 		arg.UserID,
 		arg.FailedCount,
 		arg.LockUntil,

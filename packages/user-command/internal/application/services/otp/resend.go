@@ -2,7 +2,6 @@ package otp
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"user-command-module/internal/application/commands/resend_otp"
@@ -17,12 +16,10 @@ func (s *otpService) Resend(ctx context.Context, cmd resend_otp.Command) (*resen
 		return nil, s.wrapError(err)
 	}
 
-	expiresAt, otp, err := s.generateAndSaveNewOTP(ctx, cmd.SessionToken, session)
+	expiresAt, _, err := s.generateAndSaveNewOTP(ctx, cmd.SessionToken, session)
 	if err != nil {
 		return nil, s.wrapError(err)
 	}
-
-	fmt.Printf("[RESEND] Email: %s, OTP: %s\n", session.Email, otp)
 
 	return &resend_otp.Result{ExpiresAt: expiresAt}, nil
 }

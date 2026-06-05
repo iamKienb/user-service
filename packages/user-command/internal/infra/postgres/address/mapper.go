@@ -8,15 +8,19 @@ import (
 	"github.com/iamKienb/go-core/postgres/conv"
 )
 
-func toInfraUserAddress(params *domain_address.UserAddress) repository.SaveUserAddressParams {
-	return repository.SaveUserAddressParams{
+func toInfraUserAddress(params *domain_address.UserAddress) repository.CreateUserAddressParams {
+	return repository.CreateUserAddressParams{
 		ID:     conv.UUID(params.ID),
 		UserID: conv.UUID(params.UserID),
 
-		CountryID:  int32(params.CountryID),
-		CityID:     int32(params.CityID),
-		DistrictID: int32(params.DistrictID),
-		WardID:     int32(params.WardID),
+		CountryID:   params.CountryID,
+		CountryName: params.CountryName,
+
+		ProvinceID:   params.ProvinceID,
+		ProvinceName: params.ProvinceName,
+
+		WardID:   params.WardID,
+		WardName: params.WardName,
 
 		AddressLine:  params.AddressLine,
 		ReceiverName: params.ReceiverName,
@@ -34,10 +38,14 @@ func toDomainUserAddress(row repository.UserAddress) *domain_address.UserAddress
 		ID:     shared.UserAddressID(row.ID.Bytes),
 		UserID: shared.UserID(row.UserID.Bytes),
 
-		CountryID:  int(row.CountryID),
-		CityID:     int(row.CityID),
-		DistrictID: int(row.DistrictID),
-		WardID:     int(row.WardID),
+		CountryID:   row.CountryID,
+		CountryName: row.CountryName,
+
+		ProvinceID:   row.ProvinceID,
+		ProvinceName: row.ProvinceName,
+
+		WardID:   row.WardID,
+		WardName: row.WardName,
 
 		AddressLine:  row.AddressLine,
 		ReceiverName: row.ReceiverName,
