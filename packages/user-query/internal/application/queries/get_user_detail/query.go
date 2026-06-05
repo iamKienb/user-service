@@ -3,7 +3,7 @@ package get_user_detail
 import (
 	"context"
 
-	"user-query-module/internal/application/port"
+	"user-query-module/internal/application/service/models"
 )
 
 type Query struct {
@@ -11,7 +11,7 @@ type Query struct {
 }
 
 type Result struct {
-	User *port.User
+	User *models.User
 }
 
 type Executor interface {

@@ -3,12 +3,12 @@ package user
 import (
 	"strconv"
 
-	"user-query-module/internal/application/port"
+	"user-query-module/internal/application/service/models"
 
 	api "github.com/iamKienb/api-contract/gen/user"
 )
 
-func ToUserView(user *port.User) *api.UserDetail {
+func ToUserView(user *models.User) *api.UserDetail {
 	if user == nil {
 		return nil
 	}
@@ -22,7 +22,7 @@ func ToUserView(user *port.User) *api.UserDetail {
 	}
 }
 
-func ToUserViews(users []port.User) []*api.UserDetail {
+func ToUserViews(users []models.User) []*api.UserDetail {
 	views := make([]*api.UserDetail, 0, len(users))
 	for i := range users {
 		views = append(views, ToUserView(&users[i]))
@@ -30,7 +30,7 @@ func ToUserViews(users []port.User) []*api.UserDetail {
 	return views
 }
 
-func ToUserProfileView(profile *port.UserProfile) *api.ProfileDetail {
+func ToUserProfileView(profile *models.UserProfile) *api.ProfileDetail {
 	if profile == nil {
 		return nil
 	}
@@ -40,7 +40,7 @@ func ToUserProfileView(profile *port.UserProfile) *api.ProfileDetail {
 	}
 }
 
-func ToUserAddressViews(addresses []port.UserAddress) []*api.AddressDetail {
+func ToUserAddressViews(addresses []models.UserAddress) []*api.AddressDetail {
 	views := make([]*api.AddressDetail, 0, len(addresses))
 	for _, address := range addresses {
 		views = append(views, &api.AddressDetail{

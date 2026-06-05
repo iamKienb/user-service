@@ -1,4 +1,4 @@
-package port
+package models
 
 import "encoding/json"
 
@@ -27,21 +27,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 	}
 
 	*u = User(raw.userAlias)
-	if len(raw.Address) == 0 || string(raw.Address) == "null" {
-		return nil
-	}
-
-	var addresses []UserAddress
-	if err := json.Unmarshal(raw.Address, &addresses); err == nil {
-		u.Addresses = addresses
-		return nil
-	}
-
-	var address UserAddress
-	if err := json.Unmarshal(raw.Address, &address); err != nil {
-		return err
-	}
-	u.Addresses = []UserAddress{address}
+	u.Addresses = decodeOneOrMany[UserAddress](raw.Address)
 	return nil
 }
 
@@ -74,4 +60,19 @@ type UserPage struct {
 	Items         []User
 	Total         int64
 	NextPageToken string
+}
+
+func decodeOneOrMany[T any](raw json.RawMessage) []T {
+	if len(raw) == 0 || string(raw) == "null" {
+		return nil
+	}
+	var many []T
+	if err := json.Unmarshal(raw, &many); err == nil {
+		return many
+	}
+	var one T
+	if err := json.Unmarshal(raw, &one); err != nil {
+		return nil
+	}
+	return []T{one}
 }

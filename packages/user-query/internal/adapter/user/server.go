@@ -3,11 +3,11 @@ package user
 import (
 	"context"
 
-	"user-query-module/internal/application/port"
 	"user-query-module/internal/application/queries/get_user_detail"
 	"user-query-module/internal/application/queries/get_user_profile"
 	"user-query-module/internal/application/queries/list_user_addresses"
 	"user-query-module/internal/application/queries/search_users"
+	"user-query-module/internal/application/service/models"
 
 	"connectrpc.com/connect"
 	api "github.com/iamKienb/api-contract/gen/user"
@@ -63,7 +63,7 @@ func (s *queryServer) SearchUsers(ctx context.Context, req *connect.Request[api.
 	result, err := s.searchUsersExecutor.Execute(ctx, search_users.Query{
 		Keyword: req.Msg.GetKeyword(),
 		Status:  req.Msg.GetStatus(),
-		Page: port.Page{
+		Page: models.Page{
 			Size:  int(req.Msg.GetPageSize()),
 			Token: req.Msg.GetPageToken(),
 		},

@@ -5,7 +5,7 @@ import (
 	"user-query-module/internal/application/queries/get_user_profile"
 	"user-query-module/internal/application/queries/list_user_addresses"
 	"user-query-module/internal/application/queries/search_users"
-	"user-query-module/internal/application/services/user"
+	"user-query-module/internal/application/service"
 )
 
 type ApplicationModule struct {
@@ -16,7 +16,7 @@ type ApplicationModule struct {
 }
 
 func NewApplicationModule(infra *InfraModule) *ApplicationModule {
-	userQueryService := user.NewQueryService(infra.ESService)
+	userQueryService := service.NewQueryService(infra.ESService)
 
 	return &ApplicationModule{
 		GetUserDetailExecutor:     get_user_detail.NewHandler(userQueryService),

@@ -3,7 +3,7 @@ package list_user_addresses
 import (
 	"context"
 
-	"user-query-module/internal/application/port"
+	"user-query-module/internal/application/service/models"
 )
 
 type Query struct {
@@ -11,7 +11,7 @@ type Query struct {
 }
 
 type Result struct {
-	Addresses []port.UserAddress
+	Addresses []models.UserAddress
 }
 
 type Executor interface {
