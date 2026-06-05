@@ -8,13 +8,12 @@ type Page struct {
 }
 
 type User struct {
-	ID        string         `json:"id"`
-	Email     string         `json:"email"`
-	Status    string         `json:"status"`
-	Roles     []string       `json:"roles"`
-	Profile   *UserProfile   `json:"profile"`
-	Addresses []UserAddress  `json:"address"`
-	Extra     map[string]any `json:"-"`
+	ID        string        `json:"id"`
+	Email     string        `json:"email"`
+	Status    string        `json:"status"`
+	Roles     []string      `json:"roles"`
+	Profile   *UserProfile  `json:"profile"`
+	Addresses []UserAddress `json:"address"`
 }
 
 func (u *User) UnmarshalJSON(data []byte) error {
@@ -47,21 +46,28 @@ func (u *User) UnmarshalJSON(data []byte) error {
 }
 
 type UserProfile struct {
-	FullName string         `json:"full_name"`
-	Gender   string         `json:"gender"`
-	Extra    map[string]any `json:"-"`
+	FullName string `json:"full_name"`
+	Gender   string `json:"gender"`
+}
+
+type LocationRef struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type UserAddress struct {
-	ID           string         `json:"id"`
-	UserID       string         `json:"user_id"`
-	FullAddress  string         `json:"full_address"`
-	AddressLine  string         `json:"address_line"`
-	ReceiverName string         `json:"receiver_name"`
-	PhoneNumber  string         `json:"phone_number"`
-	Label        string         `json:"label"`
-	IsDefault    bool           `json:"is_default"`
-	Extra        map[string]any `json:"-"`
+	ID           string      `json:"id"`
+	UserID       string      `json:"user_id"`
+	FullAddress  string      `json:"full_address"`
+	Country      LocationRef `json:"country"`
+	Province     LocationRef `json:"province"`
+	District     LocationRef `json:"district"`
+	Ward         LocationRef `json:"ward"`
+	AddressLine  string      `json:"address_line"`
+	ReceiverName string      `json:"receiver_name"`
+	PhoneNumber  string      `json:"phone_number"`
+	Label        string      `json:"label"`
+	IsDefault    bool        `json:"is_default"`
 }
 
 type UserPage struct {

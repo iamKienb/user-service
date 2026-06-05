@@ -47,10 +47,10 @@ func ToUserAddressViews(addresses []port.UserAddress) []*api.AddressDetail {
 			AddressId:    address.ID,
 			ReceiverName: address.ReceiverName,
 			PhoneNumber:  address.PhoneNumber,
-			ProvinceId:   extraInt32(address.Extra, "province_id"),
-			ProvinceName: extraString(address.Extra, "province_name"),
-			WardId:       extraInt32(address.Extra, "ward_id"),
-			WardName:     extraString(address.Extra, "ward_name"),
+			ProvinceId:   parseLocationID(address.Province.ID),
+			ProvinceName: address.Province.Name,
+			WardId:       parseLocationID(address.Ward.ID),
+			WardName:     address.Ward.Name,
 			AddressLine:  address.AddressLine,
 			Label:        address.Label,
 			IsDefault:    address.IsDefault,
@@ -59,38 +59,10 @@ func ToUserAddressViews(addresses []port.UserAddress) []*api.AddressDetail {
 	return views
 }
 
-func extraString(extra map[string]any, key string) string {
-	value, ok := extra[key]
-	if !ok || value == nil {
-		return ""
-	}
-	switch typed := value.(type) {
-	case string:
-		return typed
-	default:
-		return ""
-	}
-}
-
-func extraInt32(extra map[string]any, key string) int32 {
-	value, ok := extra[key]
-	if !ok || value == nil {
+func parseLocationID(value string) int32 {
+	parsed, err := strconv.ParseInt(value, 10, 32)
+	if err != nil {
 		return 0
 	}
-	switch typed := value.(type) {
-	case int:
-		return int32(typed)
-	case int64:
-		return int32(typed)
-	case float64:
-		return int32(typed)
-	case string:
-		parsed, err := strconv.ParseInt(typed, 10, 32)
-		if err != nil {
-			return 0
-		}
-		return int32(parsed)
-	default:
-		return 0
-	}
+	return int32(parsed)
 }

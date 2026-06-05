@@ -116,43 +116,9 @@ func decodeHits[T any](hits []types.Hit) ([]T, error) {
 		if err := json.Unmarshal(hit.Source_, &item); err != nil {
 			return nil, fmt.Errorf("decode search hit: %w", err)
 		}
-		attachExtraFields(&item, hit.Source_)
 		items = append(items, item)
 	}
 	return items, nil
-}
-
-func attachExtraFields(target any, raw json.RawMessage) {
-	var source map[string]any
-	if err := json.Unmarshal(raw, &source); err != nil {
-		return
-	}
-
-	if item, ok := target.(*port.User); ok {
-		item.Extra = withoutKnownFields(source, userFields)
-	}
-}
-
-func withoutKnownFields(source map[string]any, known map[string]struct{}) map[string]any {
-	extra := make(map[string]any)
-	for key, value := range source {
-		if _, ok := known[key]; ok {
-			continue
-		}
-		extra[key] = value
-	}
-	return extra
-}
-
-var userFields = map[string]struct{}{
-	"id":         {},
-	"email":      {},
-	"status":     {},
-	"roles":      {},
-	"profile":    {},
-	"address":    {},
-	"created_at": {},
-	"updated_at": {},
 }
 
 func pageOffset(token string) int {
