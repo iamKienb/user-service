@@ -1,11 +1,11 @@
 package user
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"user-query-module/internal/application/port"
 
@@ -58,7 +58,7 @@ func SearchDocuments[T any](ctx context.Context, service *SearchService, spec Se
 
 	response, err := service.esService.GetClient().Search().
 		Index(spec.Index).
-		Raw(strings.NewReader(string(raw))).
+		Raw(bytes.NewReader(raw)).
 		Do(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("search %s: %w", spec.Index, err)
