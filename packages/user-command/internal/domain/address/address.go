@@ -67,7 +67,7 @@ func NewUserAddress(params NewUserAddressParams) *UserAddress {
 		UserAddressID: userAddressID,
 		UserID:        address.UserID,
 
-		CountryID:   params.ProvinceID,
+		CountryID:   params.CountryID,
 		CountryName: params.CountryName,
 
 		ProvinceID:   params.ProvinceID,

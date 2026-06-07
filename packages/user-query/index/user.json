@@ -41,6 +41,12 @@
                 "type": "keyword",
                 "normalizer": "standard_normalizer"
             },
+            "created_at": {
+                "type": "date"
+            },
+            "updated_at": {
+                "type": "date"
+            },
             "profile": {
                 "properties": {
                     "user_id": {
@@ -68,6 +74,12 @@
                     },
                     "date_of_birth": {
                         "type": "date"
+                    },
+                    "created_at": {
+                        "type": "date"
+                    },
+                    "updated_at": {
+                        "type": "date"
                     }
                 }
             },
@@ -92,7 +104,7 @@
                     },
                     "country": {
                         "properties": {
-                            "id": {
+                            "country_id": {
                                 "type": "keyword"
                             },
                             "name": {
@@ -102,17 +114,6 @@
                         }
                     },
                     "province": {
-                        "properties": {
-                            "id": {
-                                "type": "keyword"
-                            },
-                            "name": {
-                                "type": "text",
-                                "analyzer": "standard_ascii"
-                            }
-                        }
-                    },
-                    "district": {
                         "properties": {
                             "id": {
                                 "type": "keyword"

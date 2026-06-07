@@ -23,6 +23,7 @@ func NewUserEventProcessor(repo port.ESRepository) port.EventProcessor {
 	p.handlers[events.TopicUserRegistered] = handler.NewUserRegisterHandler(repo, userAlias)
 	p.handlers[events.TopicUserActivated] = handler.NewUserActivatedHandler(repo, userAlias)
 	p.handlers[events.TopicUserProfileCreated] = handler.NewUserProfileCreatedHandler(repo, userAlias)
+	p.handlers[events.TopicUserAddressAdded] = handler.NewUserAddressAddedHandler(repo, userAlias)
 
 	return p
 }

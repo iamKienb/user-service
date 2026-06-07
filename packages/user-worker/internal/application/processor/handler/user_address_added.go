@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"user-shared-module/events"
 	"user-worker-module/internal/application/port"
 )
@@ -22,7 +23,12 @@ func (h *UserAddressAddedHandler) Handle(ctx context.Context, raw json.RawMessag
 		return err
 	}
 
-	fullAddress := payload.AddressLine + payload.WardName + payload.ProvinceName
+	fullAddress := strings.Join([]string{
+		payload.AddressLine,
+		payload.WardName,
+		payload.ProvinceName,
+		payload.CountryName,
+	}, ", ")
 
 	doc := map[string]any{
 		"address": map[string]any{
