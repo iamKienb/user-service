@@ -22,7 +22,7 @@ func toInfraUser(u *domain_user.User) repository.CreateUserParams {
 	}
 }
 
-func toDomainUser(userRow repository.User, credentialRow *repository.UserCredential) *domain_user.User {
+func toDomainUser(userRow repository.User, credentialRow repository.UserCredential) *domain_user.User {
 	var emailVerifiedAt *time.Time
 	if userRow.EmailVerifiedAt.Valid {
 		emailVerifiedAt = &userRow.EmailVerifiedAt.Time

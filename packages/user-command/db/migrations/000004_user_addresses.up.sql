@@ -14,14 +14,14 @@ CREATE TABLE user_addresses (
     address_line TEXT NOT NULL,
     receiver_name TEXT NOT NULL,
     phone_number TEXT NOT NULL,
-    label TEXT NOT NULL DEFAULT 'HOUSE',
+    label TEXT NOT NULL DEFAULT 'HOME',
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT NULL,
 
     CONSTRAINT user_address_label_check
-        CHECK (label IN ('OFFICE', 'HOUSE'))
+        CHECK (label IN ('OFFICE', 'HOME'))
 );
 
 CREATE INDEX idx_user_addresses_user_id ON user_addresses(user_id);

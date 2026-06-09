@@ -38,7 +38,7 @@ func (s *userServer) RegisterUser(ctx context.Context, req *connect.Request[user
 	result, err := s.registerExecutor.Execute(ctx, toRegisterCommand(req.Msg))
 
 	if err != nil {
-		return nil, err
+		return nil, toMapError(err)
 	}
 
 	return connect.NewResponse(toRegisterResponse(result)), nil
@@ -47,7 +47,7 @@ func (s *userServer) RegisterUser(ctx context.Context, req *connect.Request[user
 func (s *userServer) LoginUser(ctx context.Context, req *connect.Request[user.LoginUserRequest]) (*connect.Response[user.LoginUserResponse], error) {
 	result, err := s.loginExecutor.Execute(ctx, toLoginCommand(req.Msg))
 	if err != nil {
-		return nil, err
+		return nil, toMapError(err)
 	}
 
 	return connect.NewResponse(toLoginResponse(result)), nil
@@ -62,7 +62,7 @@ func (s *userServer) AddUserAddress(ctx context.Context, req *connect.Request[us
 
 	result, err := s.addAddressExecutor.Execute(ctx, cmd)
 	if err != nil {
-		return nil, err
+		return nil, toMapError(err)
 	}
 
 	return connect.NewResponse(toAddAddressResponse(result)), nil
@@ -71,7 +71,7 @@ func (s *userServer) AddUserAddress(ctx context.Context, req *connect.Request[us
 func (s *userServer) GetUserAddressByID(ctx context.Context, req *connect.Request[user.GetUserAddressByIDRequest]) (*connect.Response[user.GetUserAddressByIDResponse], error) {
 	qry, err := toGetUserAddressQuery(req.Msg)
 	if err != nil {
-		return nil, err
+		return nil, toMapError(err)
 	}
 
 	result, err := s.getAddressExecutor.Execute(ctx, qry)

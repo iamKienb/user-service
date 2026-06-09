@@ -10,6 +10,8 @@ type UserRegisteredEvent struct {
 	Email     string
 	Status    StatusEnum
 	Roles     []RoleEnum
+	FullName  string
+	Gender    string
 	CreatedAt time.Time
 }
 
@@ -19,10 +21,16 @@ func (e UserRegisteredEvent) EventName() string {
 
 func (e UserRegisteredEvent) IntegrationPayload() map[string]interface{} {
 	return map[string]interface{}{
-		"user_id":    e.UserID,
-		"email":      e.Email,
-		"status":     string(e.Status),
-		"roles":      shared.Strings(e.Roles),
+		"user_id": e.UserID,
+		"email":   e.Email,
+		"status":  string(e.Status),
+		"roles":   shared.Strings(e.Roles),
+		"profile": map[string]interface{}{
+			"user_id":    e.UserID,
+			"full_name":  e.FullName,
+			"gender":     e.Gender,
+			"created_at": e.CreatedAt,
+		},
 		"created_at": e.CreatedAt,
 	}
 }

@@ -12,6 +12,7 @@ import (
 	"connectrpc.com/connect"
 	api "github.com/iamKienb/api-contract/gen/user"
 	"github.com/iamKienb/api-contract/gen/user/userconnect"
+	authx "github.com/iamKienb/go-core/middleware/auth"
 )
 
 type queryServer struct {
@@ -40,6 +41,7 @@ func (s *queryServer) GetUserDetail(ctx context.Context, req *connect.Request[ap
 	if err != nil {
 		return nil, err
 	}
+
 	return connect.NewResponse(&api.GetUserDetailResponse{User: ToUserView(result.User)}), nil
 }
 
@@ -48,14 +50,17 @@ func (s *queryServer) GetUserProfile(ctx context.Context, req *connect.Request[a
 	if err != nil {
 		return nil, err
 	}
+
 	return connect.NewResponse(&api.GetUserProfileResponse{Profile: ToUserProfileView(result.Profile)}), nil
 }
 
 func (s *queryServer) ListUserAddresses(ctx context.Context, req *connect.Request[api.ListUserAddressesRequest]) (*connect.Response[api.ListUserAddressesResponse], error) {
-	result, err := s.listUserAddressesExecutor.Execute(ctx, list_user_addresses.Query{UserID: req.Msg.GetUserId()})
+	currentUser := authx.GetUserInfoFromCtx(ctx)
+	result, err := s.listUserAddressesExecutor.Execute(ctx, list_user_addresses.Query{UserID: currentUser.UserID})
 	if err != nil {
 		return nil, err
 	}
+
 	return connect.NewResponse(&api.ListUserAddressesResponse{Addresses: ToUserAddressViews(result.Addresses)}), nil
 }
 

@@ -44,7 +44,7 @@ VALUES (
     $12::text,
     $13::boolean,
     $14::timestamptz,
-    $15::updated_at
+    $15::timestamptz
 )
 `
 
@@ -63,7 +63,7 @@ type CreateUserAddressParams struct {
 	Label        string
 	IsDefault    bool
 	CreatedAt    pgtype.Timestamptz
-	UpdatedAt    interface{}
+	UpdatedAt    pgtype.Timestamptz
 }
 
 func (q *Queries) CreateUserAddress(ctx context.Context, arg CreateUserAddressParams) error {

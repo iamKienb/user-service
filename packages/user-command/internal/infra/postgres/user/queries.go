@@ -20,15 +20,15 @@ func (r *userRepository) FindUserByID(ctx context.Context, userID shared.UserID)
 		return nil, fmt.Errorf("infra: get user by id: %w", err)
 	}
 
-	// credentialRow, err := r.getQuerier(ctx).FindUserCredentialByID(ctx, userRow.ID)
-	// if err != nil {
-	// 	if errors.Is(err, pgx.ErrNoRows) {
-	// 		return nil, nil
-	// 	}
-	// 	return nil, fmt.Errorf("infra: get credential by id: %w", err)
-	// }
+	credentialRow, err := r.getQuerier(ctx).FindUserCredentialByID(ctx, userRow.ID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("infra: get credential by id: %w", err)
+	}
 
-	return toDomainUser(userRow, nil), nil
+	return toDomainUser(userRow, credentialRow), nil
 }
 
 func (r *userRepository) FindUserByEmail(ctx context.Context, email string) (*domain_user.User, error) {
@@ -48,5 +48,5 @@ func (r *userRepository) FindUserByEmail(ctx context.Context, email string) (*do
 		return nil, fmt.Errorf("infra: get credential by id: %w", err)
 	}
 
-	return toDomainUser(userRow, &credentialRow), nil
+	return toDomainUser(userRow, credentialRow), nil
 }

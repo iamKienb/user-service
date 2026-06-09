@@ -2,6 +2,7 @@ package user
 
 import (
 	"strconv"
+	"strings"
 
 	"user-command-module/internal/application/commands/add_user_address"
 	"user-command-module/internal/application/commands/login_user"
@@ -22,7 +23,7 @@ func toRegisterCommand(req *user.RegisterUserRequest) register_user.Command {
 		Password: req.GetPassword(),
 		Profile: register_user.UserProfile{
 			FullName: profile.GetFullName(),
-			Gender:   profile.GetGender(),
+			Gender:   strings.ToUpper(profile.GetGender()),
 		},
 	}
 }
@@ -66,7 +67,7 @@ func toAddAddressCommand(userID string, req *user.AddUserAddressRequest) (add_us
 		AddressLine:  req.GetAddressLine(),
 		ReceiverName: req.GetReceiverName(),
 		PhoneNumber:  req.GetPhoneNumber(),
-		Label:        req.GetLabel(),
+		Label:        strings.ToUpper(req.GetLabel()),
 		IsDefault:    req.GetIsDefault(),
 	}, nil
 }

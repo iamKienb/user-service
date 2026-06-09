@@ -27,6 +27,7 @@ func (h *UserRegisterHandler) Handle(ctx context.Context, raw json.RawMessage) e
 		"email":      payload.Email,
 		"status":     payload.Status,
 		"roles":      payload.Roles,
+		"profile":    payload.Profile,
 		"created_at": payload.CreatedAt,
 	}
 

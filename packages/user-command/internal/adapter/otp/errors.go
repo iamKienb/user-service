@@ -19,6 +19,6 @@ var otpErrorMap = app_error.ServiceErrorMap{
 	auth.ErrResendLimit: {Kind: app_error.KindValidation, Msg: i18n.MsgResendLimit},
 }
 
-func (s *otpService) wrapError(err error) error {
+func mapError(err error) error {
 	return app_error.WrapError(err, otpErrorMap)
 }

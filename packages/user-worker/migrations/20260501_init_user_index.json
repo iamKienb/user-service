@@ -83,8 +83,9 @@
                     }
                 }
             },
-            "address": {
+            "addresses": {
                 "type": "nested",
+                "dynamic": "strict",
                 "properties": {
                     "id": {
                         "type": "keyword"
@@ -92,19 +93,9 @@
                     "user_id": {
                         "type": "keyword"
                     },
-                    "full_address": {
-                        "type": "text",
-                        "analyzer": "standard_ascii",
-                        "fields": {
-                            "raw": {
-                                "type": "keyword",
-                                "normalizer": "standard_normalizer"
-                            }
-                        }
-                    },
                     "country": {
                         "properties": {
-                            "country_id": {
+                            "id": {
                                 "type": "keyword"
                             },
                             "name": {
@@ -136,6 +127,16 @@
                         }
                     },
                     "address_line": {
+                        "type": "text",
+                        "analyzer": "standard_ascii",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
+                                "normalizer": "standard_normalizer"
+                            }
+                        }
+                    },
+                    "full_address": {
                         "type": "text",
                         "analyzer": "standard_ascii",
                         "fields": {

@@ -10,7 +10,7 @@ import (
 func (s *userService) GetAddress(ctx context.Context, qry get_user_address_by_id.Query) (*get_user_address_by_id.Result, error) {
 	_, err := s.validateAndCheckActiveUser(ctx, qry.UserID)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	address, err := s.userAddressRepo.FindAddressByID(ctx, qry.UserAddressID)
@@ -18,11 +18,11 @@ func (s *userService) GetAddress(ctx context.Context, qry get_user_address_by_id
 		return nil, err
 	}
 	if address == nil {
-		return nil, s.wrapError(domain_address.ErrAddressNotFound)
+		return nil, domain_address.ErrAddressNotFound
 	}
 
 	if address.UserID != qry.UserID {
-		return nil, s.wrapError(domain_auth.ErrAccessDenied)
+		return nil, domain_auth.ErrAccessDenied
 	}
 
 	return &get_user_address_by_id.Result{

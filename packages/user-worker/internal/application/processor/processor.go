@@ -2,22 +2,30 @@ package processor
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
+	"time"
 	"user-shared-module/alias"
 	"user-shared-module/events"
 	"user-worker-module/internal/application/port"
 	"user-worker-module/internal/application/processor/handler"
 )
 
+const (
+	idemKeyTTL = 24 * time.Hour
+	key        = "user-worker:key:%s"
+)
+
 type UserEventProcessor struct {
 	handlers map[string]port.EventHandler
+	port.WorkerCache
 }
 
-func NewUserEventProcessor(repo port.ESRepository) port.EventProcessor {
+func NewUserEventProcessor(repo port.ESRepository, workerCache port.WorkerCache) port.EventProcessor {
 	userAlias := alias.UserAlias
 
 	p := &UserEventProcessor{
-		handlers: make(map[string]port.EventHandler),
+		handlers:    make(map[string]port.EventHandler),
+		WorkerCache: workerCache,
 	}
 
 	p.handlers[events.TopicUserRegistered] = handler.NewUserRegisterHandler(repo, userAlias)
@@ -34,7 +42,19 @@ func (p *UserEventProcessor) Handle(ctx context.Context, msg port.Message) error
 		return nil
 	}
 
-	var rawPayload json.RawMessage = msg.Value
+	idemKey := msg.IdempotencyKey()
 
-	return h.Handle(ctx, rawPayload)
+	if idemKey != "" {
+		key := fmt.Sprintf(key, idemKey)
+		isNew, err := p.WorkerCache.SetNx(ctx, key, 1, idemKeyTTL)
+		if err != nil {
+			return err
+		}
+
+		if !isNew {
+			return nil
+		}
+	}
+
+	return h.Handle(ctx, msg.Value)
 }

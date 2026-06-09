@@ -65,18 +65,18 @@ func NewUser(params NewUserParams) *User {
 		Email:     user.Email,
 		Status:    user.Status,
 		Roles:     user.Roles,
+		FullName:  params.FullName,
+		Gender:    params.Gender,
 		CreatedAt: user.CreatedAt,
 	})
 
 	return user
 }
 
-func (a *User) FlushEvents() []shared.DomainEvent {
-	var domainEvents []shared.DomainEvent
+func (u *User) FlushEvents() []shared.DomainEvent {
+	events := u.Flush()
 
-	domainEvents = append(domainEvents, a.EventEntity.Flush()...)
-	a.EventEntity.ClearEvent()
-	return domainEvents
+	return events
 }
 
 func (u *User) IsActive() bool {

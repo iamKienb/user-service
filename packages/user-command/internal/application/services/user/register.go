@@ -16,22 +16,24 @@ import (
 
 func (s *userService) Register(ctx context.Context, cmd register_user.Command) (*register_user.Result, error) {
 	if err := s.ensureEmailAvailable(ctx, cmd.Email); err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	passwordHash, err := s.hasher.Hash(cmd.Password)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	validGender := domain_shared.ValidateEnum[profile.GenderEnum](cmd.Profile.Gender)
 	if validGender == nil {
-		return nil, s.wrapError(profile.ErrGenderInvalid)
+		return nil, profile.ErrGenderInvalid
 	}
 
 	newUser := user.NewUser(user.NewUserParams{
 		Email:        cmd.Email,
 		PasswordHash: passwordHash,
+		FullName:     cmd.Profile.FullName,
+		Gender:       string(*validGender),
 	})
 
 	newProfile := profile.NewProfile(profile.NewProfileParams{
@@ -50,14 +52,6 @@ func (s *userService) Register(ctx context.Context, cmd register_user.Command) (
 		})
 	}
 
-	if profileEvents := newProfile.FlushEvents(); len(profileEvents) > 0 {
-		outboxParams = append(outboxParams, port.OutboxParam{
-			AggregateID:   newUser.ID.RawID(),
-			AggregateType: newProfile.Type(),
-			Events:        profileEvents,
-		})
-	}
-
 	if err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
 		if err := s.userRepo.CreateUser(ctx, newUser); err != nil {
 			return err
@@ -73,13 +67,13 @@ func (s *userService) Register(ctx context.Context, cmd register_user.Command) (
 
 		return nil
 	}); err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 	_ = s.userCache.MarkEmailTaken(ctx, cmd.Email, shared.EmailCacheTTL)
 
 	res, err := s.createRegistrationChallenge(ctx, newUser)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	return res, nil

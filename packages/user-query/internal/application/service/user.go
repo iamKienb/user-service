@@ -48,6 +48,7 @@ func (s *queryService) GetUserDetail(ctx context.Context, query get_user_detail.
 	if err != nil {
 		return nil, err
 	}
+
 	return &get_user_detail.Result{User: user}, nil
 }
 
@@ -56,6 +57,7 @@ func (s *queryService) GetUserProfile(ctx context.Context, query get_user_profil
 	if err != nil {
 		return nil, err
 	}
+
 	return &get_user_profile.Result{Profile: user.Profile}, nil
 }
 
@@ -64,6 +66,7 @@ func (s *queryService) ListUserAddresses(ctx context.Context, query list_user_ad
 	if err != nil {
 		return nil, err
 	}
+
 	return &list_user_addresses.Result{Addresses: user.Addresses}, nil
 }
 
@@ -85,6 +88,7 @@ func (s *queryService) SearchUsers(ctx context.Context, query search_users.Query
 	}
 
 	items := usersFromHits(result.Hits)
+
 	return &search_users.Result{
 		Items:         items,
 		Total:         result.Total,
@@ -95,7 +99,7 @@ func (s *queryService) SearchUsers(ctx context.Context, query search_users.Query
 func (s *queryService) findUser(ctx context.Context, userID string) (*models.User, error) {
 	searchQuery := NewQueryBuilder().
 		WithPagination(0, 1).
-		FilterTerm("id.keyword", userID).
+		FilterTerm("id", userID).
 		Build()
 
 	result, err := SearchDocuments[models.User](ctx, s.esClient, s.index, searchQuery)
@@ -105,6 +109,7 @@ func (s *queryService) findUser(ctx context.Context, userID string) (*models.Use
 	if len(result.Hits) == 0 {
 		return nil, app_error.NotFound(errMsgUserMissing, nil)
 	}
+
 	return &result.Hits[0].Source, nil
 }
 
@@ -113,6 +118,7 @@ func usersFromHits(hits []SearchHit[models.User]) []models.User {
 	for _, hit := range hits {
 		items = append(items, hit.Source)
 	}
+
 	return items
 }
 
@@ -120,6 +126,7 @@ func normalizePage(page models.Page) models.Page {
 	if page.Size <= 0 || page.Size > maxPageSize {
 		page.Size = defaultPageSize
 	}
+
 	return page
 }
 
@@ -131,6 +138,7 @@ func pageOffset(token string) int {
 	if err != nil || offset < 0 {
 		return 0
 	}
+
 	return offset
 }
 
@@ -139,5 +147,6 @@ func nextPageToken(page models.Page, resultCount int, total int64) string {
 	if int64(nextOffset) >= total || resultCount == 0 {
 		return ""
 	}
+
 	return strconv.Itoa(nextOffset)
 }

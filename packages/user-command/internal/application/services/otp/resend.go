@@ -13,12 +13,12 @@ import (
 func (s *otpService) Resend(ctx context.Context, cmd resend_otp.Command) (*resend_otp.Result, error) {
 	session, err := s.verifyResendPolicy(ctx, cmd.SessionToken)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	expiresAt, _, err := s.generateAndSaveNewOTP(ctx, cmd.SessionToken, session)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	return &resend_otp.Result{ExpiresAt: expiresAt}, nil

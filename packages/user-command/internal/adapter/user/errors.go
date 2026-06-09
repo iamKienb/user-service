@@ -5,19 +5,19 @@ import (
 	"user-command-module/internal/domain/address"
 	"user-command-module/internal/domain/auth"
 	"user-command-module/internal/domain/profile"
-	"user-command-module/internal/domain/user"
+	domain_user "user-command-module/internal/domain/user"
 
 	"github.com/iamKienb/go-core/app_error"
 )
 
 var userErrorMap = app_error.ServiceErrorMap{
-	user.ErrEmailEmpty:         {Kind: app_error.KindValidation, Msg: i18n.MsgEmailEmpty},
-	user.ErrEmailInvalid:       {Kind: app_error.KindValidation, Msg: i18n.MsgEmailInvalid},
-	user.ErrEmailTaken:         {Kind: app_error.KindConflict, Msg: i18n.MsgEmailTaken},
-	user.ErrUserNotFound:       {Kind: app_error.KindNotFound, Msg: i18n.MsgUserNotFound},
-	user.ErrUserInvalid:        {Kind: app_error.KindValidation, Msg: i18n.MsgUserInvalid},
-	user.ErrCredentialNotFound: {Kind: app_error.KindNotFound, Msg: i18n.MsgCredentialNotFound},
-	user.ErrUserNotActive:      {Kind: app_error.KindForbidden, Msg: i18n.MsgUserNotActive},
+	domain_user.ErrEmailEmpty:         {Kind: app_error.KindValidation, Msg: i18n.MsgEmailEmpty},
+	domain_user.ErrEmailInvalid:       {Kind: app_error.KindValidation, Msg: i18n.MsgEmailInvalid},
+	domain_user.ErrEmailTaken:         {Kind: app_error.KindConflict, Msg: i18n.MsgEmailTaken},
+	domain_user.ErrUserNotFound:       {Kind: app_error.KindNotFound, Msg: i18n.MsgUserNotFound},
+	domain_user.ErrUserInvalid:        {Kind: app_error.KindValidation, Msg: i18n.MsgUserInvalid},
+	domain_user.ErrCredentialNotFound: {Kind: app_error.KindNotFound, Msg: i18n.MsgCredentialNotFound},
+	domain_user.ErrUserNotActive:      {Kind: app_error.KindForbidden, Msg: i18n.MsgUserNotActive},
 
 	profile.ErrNameEmpty:     {Kind: app_error.KindValidation, Msg: i18n.MsgNameEmpty},
 	profile.ErrNameTooLong:   {Kind: app_error.KindValidation, Msg: i18n.MsgNameTooLong},
@@ -31,6 +31,6 @@ var userErrorMap = app_error.ServiceErrorMap{
 	auth.ErrAccessDenied:       {Kind: app_error.KindUnauthorized, Msg: i18n.MsgAccessDenied},
 }
 
-func (s *userService) wrapError(err error) error {
+func toMapError(err error) error {
 	return app_error.WrapError(err, userErrorMap)
 }

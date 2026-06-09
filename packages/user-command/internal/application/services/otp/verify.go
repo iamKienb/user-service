@@ -15,17 +15,17 @@ import (
 func (s *otpService) Verify(ctx context.Context, cmd verify_otp.Command) (*verify_otp.Result, error) {
 	otpEntry, err := s.validateOTP(ctx, cmd.SessionToken, cmd.OTP)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	user, err := s.activateUserIfNeeded(ctx, otpEntry.UserID)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	profile, err := s.profileRepo.FindProfileByID(ctx, user.ID)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	tokenPair, err := s.tokenGen.GeneratePair(port.UserClaims{
@@ -36,7 +36,7 @@ func (s *otpService) Verify(ctx context.Context, cmd verify_otp.Command) (*verif
 		PasswordVersion: user.Credential.PasswordVersion,
 	})
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	_ = s.otpCache.DeleteOTP(ctx, cmd.SessionToken)
@@ -89,29 +89,28 @@ func (s *otpService) activateUserIfNeeded(ctx context.Context, userID string) (*
 	}
 
 	var outboxParams []port.OutboxParam
-	if events := u.FlushEvents(); len(events) > 0 {
-		outboxParams = append(outboxParams, port.OutboxParam{
-			AggregateID:   u.ID.RawID(),
-			AggregateType: u.Type(),
-			Events:        events,
-		})
+	if u.ActivateIfVerified() {
+		if events := u.FlushEvents(); len(events) > 0 {
+			outboxParams = append(outboxParams, port.OutboxParam{
+				AggregateID:   u.ID.RawID(),
+				AggregateType: u.Type(),
+				Events:        events,
+			})
+		}
 	}
 
-	if u.ActivateIfVerified() {
-		err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
-			if err := s.userRepo.UpdateUser(ctx, u); err != nil {
-				return err
-			}
-
-			if len(outboxParams) > 0 {
-				return s.outboxService.PublishBatch(ctx, outboxParams)
-			}
-
-			return nil
-		})
-		if err != nil {
-			return nil, s.wrapError(err)
+	if err := s.txManager.WithTx(ctx, func(ctx context.Context) error {
+		if err := s.userRepo.UpdateUser(ctx, u); err != nil {
+			return err
 		}
+
+		if len(outboxParams) > 0 {
+			return s.outboxService.PublishBatch(ctx, outboxParams)
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 
 	return u, nil

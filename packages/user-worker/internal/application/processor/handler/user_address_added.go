@@ -31,32 +31,36 @@ func (h *UserAddressAddedHandler) Handle(ctx context.Context, raw json.RawMessag
 	}, ", ")
 
 	doc := map[string]any{
-		"address": map[string]any{
-			"id":      payload.UserAddressID,
-			"user_id": payload.UserID,
+		"id":      payload.UserAddressID,
+		"user_id": payload.UserID,
 
-			"full_address": fullAddress,
-			"country": map[string]any{
-				"country_id": payload.CountryID,
-				"name":       payload.CountryName,
-			},
-			"province": map[string]any{
-				"id":   payload.ProvinceID,
-				"name": payload.ProvinceName,
-			},
-			"ward": map[string]any{
-				"id":   payload.WardID,
-				"name": payload.WardName,
-			},
-
-			"address_line":  payload.AddressLine,
-			"receiver_name": payload.ReceiverName,
-			"phone_number":  payload.PhoneNumber,
-			"label":         payload.Label,
-			"is_default":    payload.IsDefault,
-			"created_at":    payload.CreatedAt,
+		"country": map[string]any{
+			"id":   payload.CountryID,
+			"name": payload.CountryName,
 		},
+		"province": map[string]any{
+			"id":   payload.ProvinceID,
+			"name": payload.ProvinceName,
+		},
+		"ward": map[string]any{
+			"id":   payload.WardID,
+			"name": payload.WardName,
+		},
+
+		"address_line":  payload.AddressLine,
+		"full_address":  fullAddress,
+		"receiver_name": payload.ReceiverName,
+		"phone_number":  payload.PhoneNumber,
+		"label":         payload.Label,
+		"is_default":    payload.IsDefault,
+		"created_at":    payload.CreatedAt,
 	}
 
-	return h.repo.SyncData(ctx, h.alias, payload.UserID, doc)
+	return h.repo.SyncNestedData(ctx, port.NestedParams{
+		Index:         h.alias,
+		DocID:         payload.UserID,
+		NestedField:   "addresses",
+		NestedFieldID: payload.UserAddressID,
+		Data:          doc,
+	})
 }

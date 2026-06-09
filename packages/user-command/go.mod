@@ -6,8 +6,8 @@ require (
 	connectrpc.com/connect v1.19.2
 	connectrpc.com/grpcreflect v1.3.0
 	github.com/google/uuid v1.6.0
-	github.com/iamKienb/api-contract v0.2.9
-	github.com/iamKienb/go-core v0.4.7
+	github.com/iamKienb/api-contract v0.3.0
+	github.com/iamKienb/go-core v1.3.0
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/redis/go-redis/v9 v9.17.3
 	golang.org/x/crypto v0.49.0

@@ -9,7 +9,7 @@ type LabelEnum string
 
 const (
 	LabelOffice LabelEnum = "OFFICE"
-	LabelHouse  LabelEnum = "HOUSE"
+	LabelHouse  LabelEnum = "HOME"
 )
 
 type UserAddress struct {
@@ -85,6 +85,16 @@ func NewUserAddress(params NewUserAddressParams) *UserAddress {
 	})
 
 	return address
+}
+
+func (a *UserAddress) FlushEvents() []shared.DomainEvent {
+	events := a.Flush()
+
+	return events
+}
+
+func (a *UserAddress) Type() string {
+	return "USER_ADDRESS"
 }
 
 func (e LabelEnum) IsValid() bool {

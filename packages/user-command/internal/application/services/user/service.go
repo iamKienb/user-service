@@ -73,13 +73,13 @@ func NewUserService(
 func (s *userService) validateAndCheckActiveUser(ctx context.Context, userID shared.UserID) (*domain_user.User, error) {
 	user, err := s.userRepo.FindUserByID(ctx, userID)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 	if user == nil {
-		return nil, s.wrapError(domain_user.ErrUserNotFound)
+		return nil, domain_user.ErrUserNotFound
 	}
 	if err := user.EnsureActive(); err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 	return user, nil
 }

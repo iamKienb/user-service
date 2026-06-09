@@ -4,4 +4,3 @@ CREATE TABLE user_credentials (
     password_version INT NOT NULL DEFAULT 1,
     password_updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 )
-   

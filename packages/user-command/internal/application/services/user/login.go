@@ -12,16 +12,16 @@ import (
 func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login_user.Result, error) {
 	user, err := s.userRepo.FindUserByEmail(ctx, cmd.Email)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	if err := s.verifyLoginPolicy(ctx, user, cmd.Password); err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	profile, err := s.profileRepo.FindProfileByID(ctx, user.ID)
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	tokenPair, err := s.tokenGen.GeneratePair(port.UserClaims{
@@ -32,7 +32,7 @@ func (s *userService) Login(ctx context.Context, cmd login_user.Command) (*login
 		PasswordVersion: user.Credential.PasswordVersion,
 	})
 	if err != nil {
-		return nil, s.wrapError(err)
+		return nil, err
 	}
 
 	return &login_user.Result{

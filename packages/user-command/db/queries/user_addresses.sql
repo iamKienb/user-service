@@ -31,7 +31,7 @@ VALUES (
     @label::text,
     @is_default::boolean,
     @created_at::timestamptz,
-    @updated_at::updated_at
+    @updated_at::timestamptz
 );
 
 -- name: FindUserAddressByID :one
