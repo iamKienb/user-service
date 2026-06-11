@@ -26,7 +26,7 @@ func (s *otpServer) Verify(ctx context.Context, req *connect.Request[otpv1.Verif
 	cmd := ToVerifyCommand(req.Msg)
 	result, err := s.verifyOTPExecutor.Execute(ctx, cmd)
 	if err != nil {
-		return nil, mapError(err)
+		return nil, toApplicationError(err)
 	}
 
 	return connect.NewResponse(ToVerifyResponse(result)), nil
@@ -36,7 +36,7 @@ func (s *otpServer) Resend(ctx context.Context, req *connect.Request[otpv1.Resen
 	cmd := ToResendCommand(req.Msg)
 	result, err := s.resendOTPExecutor.Execute(ctx, cmd)
 	if err != nil {
-		return nil, mapError(err)
+		return nil, toApplicationError(err)
 	}
 
 	return connect.NewResponse(ToResendResponse(result)), nil

@@ -6,7 +6,7 @@ require (
 	connectrpc.com/connect v1.19.2
 	connectrpc.com/grpcreflect v1.3.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.5
-	github.com/iamKienb/api-contract v0.3.0
+	github.com/iamKienb/api-contract v0.3.3
 	github.com/iamKienb/go-core v1.3.0
 	golang.org/x/net v0.52.0
 )

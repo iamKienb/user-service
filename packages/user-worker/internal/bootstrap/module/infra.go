@@ -18,7 +18,7 @@ type InfraModule struct {
 	RedisService redisx.RedisXService
 	Kafka        kafkax.KafkaXService
 	ESRepo       port.ESRepository
-	WorkerCache  port.WorkerCache
+	workerCache  port.WorkerCache
 }
 
 func NewInfraModule(ctx context.Context, cfg *config.UserWorkerConfig) (*InfraModule, error) {
@@ -42,6 +42,6 @@ func NewInfraModule(ctx context.Context, cfg *config.UserWorkerConfig) (*InfraMo
 		RedisService: redisService,
 		Kafka:        kafka,
 		ESRepo:       elasticsearch.NewESRepository(esService, esService.GetClient()),
-		WorkerCache:  cache.NewWorkerCache(redisService.GetClient()),
+		workerCache:  cache.NewWorkerCache(redisService.GetClient()),
 	}, nil
 }

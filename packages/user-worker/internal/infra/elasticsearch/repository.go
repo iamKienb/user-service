@@ -37,6 +37,7 @@ func (r *esRepository) SyncNestedData(ctx context.Context, param port.NestedPara
 	`
 
 	upsertData := map[string]any{
+		"id":              param.DocID,
 		param.NestedField: []any{param.Data},
 	}
 

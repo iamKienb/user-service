@@ -11,6 +11,6 @@ type ApplicationModule struct {
 
 func NewApplicationModule(infra *InfraModule) *ApplicationModule {
 	return &ApplicationModule{
-		EventProcessor: processor.NewUserEventProcessor(infra.ESRepo, infra.WorkerCache),
+		EventProcessor: processor.NewUserEventProcessor(infra.ESRepo, infra.workerCache),
 	}
 }

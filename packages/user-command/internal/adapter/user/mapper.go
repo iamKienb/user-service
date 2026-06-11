@@ -102,10 +102,10 @@ func toGetUserAddressResponse(result *get_user_address_by_id.Result) *user.GetUs
 			ReceiverName: result.ReceiverName,
 			PhoneNumber:  result.PhoneNumber,
 
-			ProvinceId:   toInt32(result.ProvinceID),
+			ProvinceId:   result.ProvinceID,
 			ProvinceName: result.ProvinceName,
 
-			WardId:   toInt32(result.WardID),
+			WardId:   result.WardID,
 			WardName: result.WardName,
 
 			AddressLine: result.AddressLine,

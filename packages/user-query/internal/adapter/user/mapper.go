@@ -1,8 +1,6 @@
 package user
 
 import (
-	"strconv"
-
 	"user-query-module/internal/application/service/models"
 
 	api "github.com/iamKienb/api-contract/gen/user"
@@ -47,9 +45,9 @@ func ToUserAddressViews(addresses []models.UserAddress) []*api.AddressDetail {
 			AddressId:    address.ID,
 			ReceiverName: address.ReceiverName,
 			PhoneNumber:  address.PhoneNumber,
-			ProvinceId:   parseLocationID(address.Province.ID),
+			ProvinceId:   address.Province.ID,
 			ProvinceName: address.Province.Name,
-			WardId:       parseLocationID(address.Ward.ID),
+			WardId:       address.Ward.ID,
 			WardName:     address.Ward.Name,
 			AddressLine:  address.AddressLine,
 			Label:        address.Label,
@@ -57,12 +55,4 @@ func ToUserAddressViews(addresses []models.UserAddress) []*api.AddressDetail {
 		})
 	}
 	return views
-}
-
-func parseLocationID(value string) int32 {
-	parsed, err := strconv.ParseInt(value, 10, 32)
-	if err != nil {
-		return 0
-	}
-	return int32(parsed)
 }

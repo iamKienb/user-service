@@ -16,8 +16,8 @@ const (
 )
 
 type UserEventProcessor struct {
-	handlers map[string]port.EventHandler
-	port.WorkerCache
+	handlers    map[string]port.EventHandler
+	workerCache port.WorkerCache
 }
 
 func NewUserEventProcessor(repo port.ESRepository, workerCache port.WorkerCache) port.EventProcessor {
@@ -25,7 +25,7 @@ func NewUserEventProcessor(repo port.ESRepository, workerCache port.WorkerCache)
 
 	p := &UserEventProcessor{
 		handlers:    make(map[string]port.EventHandler),
-		WorkerCache: workerCache,
+		workerCache: workerCache,
 	}
 
 	p.handlers[events.TopicUserRegistered] = handler.NewUserRegisterHandler(repo, userAlias)
@@ -46,7 +46,7 @@ func (p *UserEventProcessor) Handle(ctx context.Context, msg port.Message) error
 
 	if idemKey != "" {
 		key := fmt.Sprintf(key, idemKey)
-		isNew, err := p.WorkerCache.SetNx(ctx, key, 1, idemKeyTTL)
+		isNew, err := p.workerCache.SetNx(ctx, key, 1, idemKeyTTL)
 		if err != nil {
 			return err
 		}
